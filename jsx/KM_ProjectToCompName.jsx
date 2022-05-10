@@ -1,5 +1,10 @@
 /**
  * Renames Comp to project name
+ * 
+ * Click will result in trimming project code from file name
+ * 
+ * Shift+Click will result in renaming to full file name
+ * 
  * @title KM_ProjectToCompName
  * @author Kyle Harter <k.harter@glassandmarker.com>
  * @version 0.2.1
@@ -8,7 +13,7 @@
  * 
 */
 
-(function projectToCompName() {
+(function km_projectToCompName() {
 
 
 
@@ -64,17 +69,17 @@
 
     app.beginUndoGroup("Rename Composition Project Name");
 
-    var shiftHeld = ScriptUI.environment.keyboardState.shiftKey;
-    if (shiftHeld) {
-        return compName.name = projectName;
-    } else {
-        if (projNameNoProjCode == "") {
-            alert("No Project Code Present. Shift+Click script for full project name")
-            return
+        var shiftHeld = ScriptUI.environment.keyboardState.shiftKey;
+        if (shiftHeld) {
+            return compName.name = projectName;
         } else {
-            return compName.name = projNameNoProjCode
+            if (projNameNoProjCode == "") {
+                alert("No Project Code Present. Shift+Click script for full project name")
+                return
+            } else {
+                return compName.name = projNameNoProjCode
+            }
         }
-    }
 
     app.endUndoGroup()
     
