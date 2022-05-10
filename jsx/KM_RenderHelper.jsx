@@ -18,26 +18,44 @@ function km_renderHelper(thisObj) {
 
         var activeSelection = app.project.selection;
 
+    if (!(app.project.activeItem instanceof CompItem)) {
+        alert("Select a comp first")
+        return
+        }
+    
         if (activeSelection.length === 0) {
             alert("Select a comp first")
             return
         }
         
+    
+    
         //// GLOBAL FUNCTIONS
         
-        function getComps(activeSelection) {
+        function getActiveSelection() {
             var compNameArray = new Array();
-            var activeSelection = app.project.selection;
             // var activeItem = app.project.activeItem;
-            if (activeSelection.length > 0) {
-                for (var i = 0; i < activeSelection.length; i++) {
+            for (var i = 0; i < activeSelection.length; i++) {
+                if (activeSelection[i] instanceof CompItem) {
                     compNameArray.push(activeSelection[i])
-                }
+                } 
             }
-            return compNameArray
+                return compNameArray
+        }
+    
+        function getActiveComp() {
+            var activeComp = app.project.activeItem;
+
+            if (activeComp instanceof CompItem){
+                return activeComp
+            }
+
         }
 
-        var compsSelected = getComps();
+    
+    alert(getActiveComp().name)
+    
+        var compsSelected = getComps(activeSelection);
 
         function addToRenderQueue(compsSelected) {
             var renderQueue = app.project.renderQueue;
@@ -46,16 +64,16 @@ function km_renderHelper(thisObj) {
             }
 
             for (var i = 0; i < compsSelected.length; i++) {
-                renderQueue.items.add(getComps()[i]);
+                renderQueue.items.add(compsSelected[i]);
             }
 
-        }
+        // }
 
-        app.beginUndoGroup("remove and add items from Render queue");
+        // app.beginUndoGroup("remove and add items from Render queue");
 
-        addToRenderQueue()
+        // addToRenderQueue()
 
-        app.endUndoGroup();
+        // app.endUndoGroup();
 
                 
         function buildUI(thisObj) {
