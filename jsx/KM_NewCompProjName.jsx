@@ -1,3 +1,15 @@
+/**
+ * Creates new comp based on project name
+ * @title KM_NewCompProjName
+ * @author Kyle Harter <k.harter@glassandmarker.com>
+ * @version 0.2.0
+ * 5.10.2022
+ * 
+ * 
+*/
+
+
+(function newCompProjName(){
 function getFolderName() {
     var folderName = "01 Main Comps";
     if (typeof folderName === "string") {
@@ -32,7 +44,7 @@ function createNewGMComp(projItems, compParams) {
         projectName = projectName.substring(0, projectName.lastIndexOf("."));
     }
     var mainCompFolder = getFolderName()[0];
-    var newComp = projItems.addComp(projectName, compParams.compWidth, compParams.compHeight, 1.0, compParams.compDuration, compParams.compFrameRate);
+    var newComp = projItems.addComp(projectName.replace(/%20/g," "), compParams.compWidth, compParams.compHeight, 1.0, compParams.compDuration, compParams.compFrameRate);
     newComp.parentFolder = mainCompFolder;
     newComp.openInViewer()
     return newComp
@@ -55,4 +67,7 @@ var projItems = app.project.items;
 
 createNewGMComp(projItems, compParams);
 
-app.endUndoGroup()
+    app.endUndoGroup()
+
+
+})()
