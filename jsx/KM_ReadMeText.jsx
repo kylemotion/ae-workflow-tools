@@ -1,4 +1,4 @@
-/*
+/**
  * Adds a text layer with a custom Read Me message
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>

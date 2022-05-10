@@ -1,4 +1,4 @@
-/*
+/**
  * Set Anchor Point of Position Property in Shape Group 
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
