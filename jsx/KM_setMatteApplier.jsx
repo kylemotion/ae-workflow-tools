@@ -1,44 +1,43 @@
 /**
  * Batch set matte applying tool
  * 
- * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.0
+ * @title Set Matte Applier
+ * @author Kyle Harter <k.harter@glassandmarker.com>
+ * @version 0.2.1
  * 5.9.2022
  * 
  * 
 */
 
+(function km_setMatteApplier() {
+    
 
 var globalLayers = [];
 var globalLayerNames = [];
 
 var mainWindow = new Window("window", "Set Matte Applier", undefined);
 mainWindow.orientation = "column";
+mainWindow.alignChildren = ["center", "center"];
 
-var mainButtonPanel = mainWindow.add("group", undefined, "Push Me");
-mainButtonPanel.orientation = "row";
-var matteLayerStatic = mainButtonPanel.add("statictext", undefined, "Select Matte Layer:");
-var mainButtonDD = mainButtonPanel.add("dropdownlist", undefined, ["Click Refresh to Populate"]);
+var setMatteSettingsPanel = mainWindow.add("panel", undefined, "Set Matte Settings");
+setMatteSettingsPanel.orientation = "column";
+setMatteSettingsPanel.alignChildren = ["left", "fill"]
+setMatteSettingsPanel.margins = 15;
+    var matteLayerStatic = setMatteSettingsPanel.add("statictext", undefined, "Select Matte Layer:");
+    
+var mainButtonDD = setMatteSettingsPanel.add("dropdownlist", [0,0,160,25], ["Click Refresh to Populate"]);
 mainButtonDD.selection = 0;
-mainButtonDD.size = [160, 25];
-var invertMatte = mainButtonPanel.add("checkbox", undefined, "Invert Matte");
+var invertMatte = setMatteSettingsPanel.add("checkbox", undefined, "\u00A0Invert Matte");
 invertMatte.value = false;
 
-// var extraSettingsPanel = mainWindow.add("panel", undefined,);
-// extraSettingsPanel.orientation = "row";
-// extraSettingsPanel.size = [250, 35];
-// var useForMatteDropDown = extraSettingsPanel.add("dropdownlist", undefined, ["Use For Matte"]);
-// useForMatteDropDown.selection = 0;
-// useForMatteDropDown.size = [160,25]
-
-
 var applyGroup = mainWindow.add("group", undefined, "Push Me");
-applyGroup.orientation = 'row'
+    applyGroup.orientation = 'row';
+    applyGroup.alignChildren = "fill";
 var helpButton = applyGroup.add("button", undefined, "Help Me");
-helpButton.size = [100, 40];
+// helpButton.size = [25, 25];
 helpButton.helpTip = "How to use:\n1. Select layer that will serve as matte in the dropdown\n2. Check Invert Matte for Invert Matte\n3. Click apply!";
 var applyButton = applyGroup.add("button", undefined, "Apply Matte");
-applyButton.size = [100, 40];
+// applyButton.size = [100, 25];
 
 mainWindow.center();
 mainWindow.show();
@@ -109,4 +108,4 @@ applyButton.onClick = function () {
     app.endUndoGroup();
 }
 
-
+})()
