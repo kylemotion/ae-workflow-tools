@@ -14,7 +14,8 @@ function km_renderHelper(thisObj) {
         /// GLOBAL VARIABLES
         
         var scriptName = "KM-Render Helper";
-
+        var panelWidth = 200;
+        var textFieldHeight = 30;
 
         var activeSelection = app.project.selection;
 
@@ -49,13 +50,9 @@ function km_renderHelper(thisObj) {
             if (activeComp instanceof CompItem){
                 return activeComp
             }
-
         }
-
     
-    alert(getActiveComp().name)
-    
-        var compsSelected = getComps(activeSelection);
+    var compsSelected = getActiveSelection();
 
         function addToRenderQueue(compsSelected) {
             var renderQueue = app.project.renderQueue;
@@ -67,7 +64,9 @@ function km_renderHelper(thisObj) {
                 renderQueue.items.add(compsSelected[i]);
             }
 
-        // }
+        }
+    
+    
 
         // app.beginUndoGroup("remove and add items from Render queue");
 
@@ -79,19 +78,20 @@ function km_renderHelper(thisObj) {
         function buildUI(thisObj) {
 
             var w = (thisObj instanceof Panel) ? thisObj : new Window("palette", scriptName)
-            var mainWindow = new Window("window", "Render Helper", undefined, { resizeable: true });
+            var mainWindow = w.add("group");
             mainWindow.orientation = "column";
-            mainWindow.alignment = ["fill", "fill"];
+            mainWindow.alignChildren = ["left", "fill"];
 
+
+            // ----- A panel  for setting the save location of your render ------
             var saveLocationPanel = mainWindow.add("panel", undefined, "Output Location");
-            saveLocationPanel.orientation = 'column';
-            saveLocationPanel.size = [250, 100];
+            saveLocationPanel.orientation = 'row';
             // saveLocationPanel.spacing = 20;
-            saveLocationPanel.alignChildren = "left";
-            var saveLocationResult = saveLocationPanel.add("group", undefined, "Save Name Bottom");
-            saveLocationResult.orientation = 'column';
-            saveLocationResult.alignChildren = "left";
-            var saveLocationChange = saveLocationResult.add("StaticText", undefined, 'Click Button To Update');
+            // var saveLocationResult = saveLocationPanel.add("group", undefined, "Save Name Bottom");
+            // saveLocationResult.orientation = 'column';
+            // saveLocationResult.alignChildren = ["left", "fill"];
+            var saveLocationChange = saveLocationPanel.add("EditText", undefined, 'Click Button To Update');
+            saveLocationChange.preferredSize = [panelWidth, textFieldHeight] 
             var folderPath = "~/Desktop";
             saveLocationChange.text = folderPath;
 
@@ -100,10 +100,13 @@ function km_renderHelper(thisObj) {
             var saveLocationButton = saveLocationButtonGroup.add("Button", undefined, "Change");
             saveLocationButton.helpTip = "Click to change output location";
 
+
+            // ----- A panel for setting the output modules and application used for your render ------
+
             var renderSettingsButtonPanel = mainWindow.add("panel", undefined, "Output Module");
             renderSettingsButtonPanel.orientation = "column";
-            renderSettingsButtonPanel.preferredSize = [250, 50];
-            renderSettingsButtonPanel.margins = 20;
+            // renderSettingsButtonPanel.preferredSize = [250, 50];
+            // renderSettingsButtonPanel.margins = 20;
             var renderAppGroup = renderSettingsButtonPanel.add("group", undefined, "render app");
             renderAppGroup.orientation = "row";
             var renderInAEButton = renderAppGroup.add('radiobutton', undefined, "Render in AE");
@@ -112,27 +115,29 @@ function km_renderHelper(thisObj) {
             var renderSettingsDropdown = renderSettingsButtonPanel.add("dropdownlist", undefined, "");
             renderSettingsDropdown.alignment = 'center';
             renderSettingsDropdown.selection = 0;
-            renderSettingsDropdown.size = [200, 25];
+            renderSettingsDropdown.size = [200, textFieldHeight];
+
+
+            // ----- A panel for setting the output name used for your render ------
 
             var saveNamePanel = mainWindow.add("panel", undefined, "Output Name");
             saveNamePanel.orientation = 'column';
             saveNamePanel.preferredSize = [250, 100];
-            saveNamePanel.margins = 15;
             saveNamePanel.spacing = 20;
             saveNamePanel.alignChildren = "left";
             var renderNameGroup = saveNamePanel.add("group", undefined, "Render Name Options");
             renderNameGroup.orientation = "column";
             renderNameGroup.alignChildren = "left";
-            var compNameButton = renderNameGroup.add("RadioButton", undefined, "Comp Name");
+            var renderNameButtonGroup = renderNameGroup.add("group", undefined, "Render Name Buttons")
+            var compNameButton = renderNameButtonGroup.add("RadioButton", undefined, "Comp Name");
             compNameButton.value = true;
-            var customNameButton = renderNameGroup.add("RadioButton", undefined, "Custom Name");
-            var renderNameEdit = saveNamePanel.add("EditText", undefined, "Enter a custom render name");
-            renderNameEdit.characters = 30;
-            var renderNameStatic = saveNamePanel.add("StaticText", undefined, 'Name:');
+            var customNameButton = renderNameButtonGroup.add("RadioButton", undefined, "Custom Name");
+            var renderNameEdit = saveNamePanel.add("EditText", [0, 0, panelWidth, textFieldHeight], "Enter a custom render name");
+            renderNameEdit.characters = 25;
             var renderNameChange = saveNamePanel.add("StaticText", undefined, '');
-            if (compNameButton.value = true) {
-                renderNameEdit.text = getComps()[0].name;
-            }
+            // if (compNameButton.value = true) {
+            //     renderNameEdit.text = getComps()[0].name;
+            // }
             renderNameChange.characters = renderNameEdit.characters;
             renderNameChange.text = renderNameEdit.text;
             renderNameEdit.onChanging = function () { renderNameChange.text = renderNameEdit.text };
@@ -152,10 +157,6 @@ function km_renderHelper(thisObj) {
             var helpButton = helpGroup.add("button", undefined, "?");
             helpButton.alignment = ["center", ""];
             helpButton.size = [25, 25];
-
-
-
-        
 
 
             function renderOutputModules() {
