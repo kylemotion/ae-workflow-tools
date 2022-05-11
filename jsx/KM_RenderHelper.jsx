@@ -86,17 +86,12 @@ function km_renderHelper(thisObj) {
             // ----- A panel  for setting the save location of your render ------
             var saveLocationPanel = mainWindow.add("panel", undefined, "Output Location");
             saveLocationPanel.orientation = 'row';
-            // saveLocationPanel.spacing = 20;
-            // var saveLocationResult = saveLocationPanel.add("group", undefined, "Save Name Bottom");
-            // saveLocationResult.orientation = 'column';
-            // saveLocationResult.alignChildren = ["left", "fill"];
             var saveLocationChange = saveLocationPanel.add("EditText", undefined, 'Click Button To Update');
             saveLocationChange.preferredSize = [panelWidth, textFieldHeight] 
             var folderPath = "~/Desktop";
             saveLocationChange.text = folderPath;
 
             var saveLocationButtonGroup = saveLocationPanel.add("group", undefined, "Save Location Top");
-            saveLocationButtonGroup.alignment = "right"
             var saveLocationButton = saveLocationButtonGroup.add("Button", undefined, "Change");
             saveLocationButton.helpTip = "Click to change output location";
 
@@ -105,8 +100,6 @@ function km_renderHelper(thisObj) {
 
             var renderSettingsButtonPanel = mainWindow.add("panel", undefined, "Output Module");
             renderSettingsButtonPanel.orientation = "column";
-            // renderSettingsButtonPanel.preferredSize = [250, 50];
-            // renderSettingsButtonPanel.margins = 20;
             var renderAppGroup = renderSettingsButtonPanel.add("group", undefined, "render app");
             renderAppGroup.orientation = "row";
             var renderInAEButton = renderAppGroup.add('radiobutton', undefined, "Render in AE");
@@ -160,18 +153,19 @@ function km_renderHelper(thisObj) {
 
 
             function renderOutputModules() {
-                outputModuleTemplates = [];
+                var  outputModuleTemplates = [];
                 var renderQueue = app.project.renderQueue;
                 var outputModules = renderQueue.item(1).outputModule(1).templates;
                 for (var i = 0; i < outputModules.length; i++) {
                     outputModuleTemplates.push(outputModules[i])
                 }
                 return outputModuleTemplates
-
             }
 
             function getFolderLoc() {
                 var folderLoc = Folder.selectDialog("Select Output Location");
+                if (folderLoc != null) {
+                    saveLocationChange.text = folderLoc.toString().replace(/%20/g, " ");
                 return folderLoc;
             }
 
