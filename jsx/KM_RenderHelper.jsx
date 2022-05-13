@@ -2,8 +2,8 @@
  * Speeds up render process without having to go through the render queue
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.1.6
- * 5.9.2022
+ * @version 0.1.7
+ * 5.13.2022
  * 
  * 
 */
@@ -24,60 +24,58 @@
 
     var activeSelection = app.project.selection;
 
-    if (!(app.project.activeItem instanceof CompItem)) {
-        alert("Select a comp first")
-        return
-    }
-    
-    if (activeSelection.length === 0) {
-        alert("Select a comp first")
-        return
-    }
-        
-    
-    
+
     //// GLOBAL FUNCTIONS
         
     function getActiveSelection() {
         var compNameArray = new Array();
-        // var activeItem = app.project.activeItem;
-        for (var i = 0; i < activeSelection.length; i++) {
-            if (activeSelection[i] instanceof CompItem) {
-                compNameArray.push(activeSelection[i])
+        if (activeSelection.length != null) {
+            for (var i = 0; i < activeSelection.length; i++) {
+                if (activeSelection[i] instanceof CompItem) {
+                    compNameArray.push(activeSelection[i])
+                }
             }
-        }
-        return compNameArray
+
+             return compNameArray
+
+        } 
+           
     }
-    
+
     function getActiveComp() {
         var activeComp = app.project.activeItem;
 
-        if (activeComp instanceof CompItem) {
+        if (activeComp && activeComp instanceof CompItem) {
             return activeComp
-        }
+        } 
     }
+
+    alert(getActiveComp().name)
     
-    var compsSelected = getActiveSelection();
+    var compSelection = getActiveSelection();
+    var activeComp = getActiveComp();
 
     function addToRenderQueue(compsSelected) {
         var renderQueue = app.project.renderQueue;
         while (renderQueue.numItems > 0) {
             renderQueue.item(1).remove();
         }
-
+        
         for (var i = 0; i < compsSelected.length; i++) {
             renderQueue.items.add(compsSelected[i]);
         }
 
     }
     
+        app.beginUndoGroup("remove and add items from Render queue");
+
+        if (compSelection.length > 1) {
+            addToRenderQueue(compSelection)
+        } else {
+            addToRenderQueue(activeComp)
+        }
     
-
-    // app.beginUndoGroup("remove and add items from Render queue");
-
-    // addToRenderQueue()
-
-    // app.endUndoGroup();
+        app.endUndoGroup();
 
         // var w = (thisObj instanceof Panel) ? thisObj : new Window("palette", scriptName)
         var mainWindow = new Window("palette", scriptName, undefined)
@@ -86,10 +84,10 @@
 
 
         var headerGroup = mainWindow.add("group", undefined, "headerGroup")
-    headerGroup.orientation = "row";
-    headerGroup.spacing = 85;
+        headerGroup.orientation = "row";
+        headerGroup.spacing = 85;
         var headerButton = headerGroup.add("image", undefined, renderHelperHeader);
-    var logoButton = headerGroup.add("image", undefined, gmLogo);
+        var logoButton = headerGroup.add("image", undefined, gmLogo);
             
 
         // ----- A panel  for setting the save location of your render ------
@@ -100,9 +98,9 @@
         var folderPath = "~/Desktop";
         saveLocationChange.text = folderPath;
 
-        var saveLocationButtonGroup = saveLocationPanel.add("group", undefined, "Save Location Top");
-        var saveLocationButton = saveLocationButtonGroup.add("Button", undefined, "Change");
-        saveLocationButton.helpTip = "Click to change output location";
+        var changeLocationButtonGroup = saveLocationPanel.add("group", undefined, "Save Location Top");
+        var changeLocationButton = changeLocationButtonGroup.add("Button", undefined, "Change");
+        changeLocationButton.helpTip = "Click to change output location";
 
 
         // ----- A panel for setting the output modules and application used for your render ------
@@ -137,13 +135,10 @@
         var renderNameEdit = saveNamePanel.add("EditText", [0, 0, panelWidth, textFieldHeight], "Enter a custom render name");
         renderNameEdit.characters = 25;
         var renderNameChange = saveNamePanel.add("StaticText", undefined, '');
-        // if (compNameButton.value = true) {
-        //     renderNameEdit.text = getComps()[0].name;
-        // }
+
         renderNameChange.characters = renderNameEdit.characters;
         renderNameChange.text = renderNameEdit.text;
         renderNameEdit.onChanging = function () { renderNameChange.text = renderNameEdit.text };
-
 
         var renderGroup = mainWindow.add("panel", undefined, "Render Me");
         renderGroup.orientation = 'row';
@@ -164,6 +159,10 @@
     mainWindow.show();
     mainWindow.center();
 
+
+    ///// helper functions ///////
+
+
             function renderOutputModules() {
                 var outputModuleTemplates = [];
                 var renderQueue = app.project.renderQueue;
@@ -174,18 +173,13 @@
                 return outputModuleTemplates
             }
 
-            function getFolderLoc() {
+            changeLocationButton.onClick = function () {
+                app.beginUndoGroup("output location");
                 var folderLoc = Folder.selectDialog("Select Output Location");
                 if (folderLoc != null) {
                     saveLocationChange.text = folderLoc.toString().replace(/%20/g, " ");
-                    return folderLoc;
+                    return saveLocationChange.text;
                 }
-            }
-
-            saveLocationButton.onClick = function () {
-                app.beginUndoGroup("output location");
-                getFolderLoc().toString();
-                saveLocationChange.text = getFolderLoc().toString().replace(/%20/g, " ");
                 app.endUndoGroup()
             }
 
@@ -194,7 +188,6 @@
             }
         
             function populateOutputModules(renderSettingsDropdown) {
-                var outputArray = new Array();
                 renderSettingsDropdown.removeAll();
 
                 for (var i = 0; i < renderOutputModules().length; i++) {
@@ -203,11 +196,32 @@
                     }
                 }
 
-                renderSettingsDropdown.selection = 0;
+                return renderSettingsDropdown
             }
 
-            populateOutputModules(renderSettingsDropdown);
+    
+    
+            if (renderInAEButton.value == true) {
+                populateOutputModules(renderSettingsDropdown);
+                renderSettingsDropdown.selection = 0
+            }
+                    
+            renderInAEButton.onClick = function () {
+                populateOutputModules(renderSettingsDropdown);
+                renderSettingsDropdown.selection = 0
+            }
+                
+            renderInAMEButton.onClick = function () {
+                renderSettingsDropdown.removeAll()
+                renderSettingsDropdown.add("item", ["Recent render settings in AME"])
+                renderSettingsDropdown.selection = 0
+            }
 
+    
+             
+    
+    
+    
 
             function startRenderProcess(renderSettingsDropdown, compNameButton, renderNameEdit) {
 
