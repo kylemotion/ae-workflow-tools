@@ -1,3 +1,16 @@
+/**
+ * Creates a slider on a control layer named "Controls" and will link selected properties to that slider control 
+ * 
+ * 
+ * 
+ * @title KM_PropertyController
+ * @author Kyle Harter <k.harter@glassandmarker.com>
+ * @version 0.1.0
+ * 5.17.2022
+ * 
+ * 
+*/
+
 (function km_propertyController() {
 
     var comp = app.project.activeItem;
