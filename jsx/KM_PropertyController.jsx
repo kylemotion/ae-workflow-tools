@@ -22,11 +22,18 @@
         return
     }
 
+    /**
+     * 
+     * @param {Object} comp active comp or item in project
+     * @returns {number} number of selected properties
+     */
+
     function getSelectedProperties(comp) {
 
         var selectedProperties = comp.selectedProperties;
         return selectedProperties
     }
+
 
 
     var selectedProps = getSelectedProperties(comp);
@@ -39,6 +46,13 @@
 
     createUI(thisObj);
 
+
+/**
+ * 
+ * @param {Object} thisObj
+ * 
+ *  
+ */
 
     function createUI(thisObj) {
         var win = thisObj instanceof Panel
@@ -88,6 +102,13 @@
     }
 
 
+/**
+ * 
+ * @param {Object} comp 
+ * @returns 
+ */
+
+
     function getControlLayer(comp) {
         var numLayers = comp.numLayers;
 
@@ -105,6 +126,13 @@
     }
 
     var controlsLayer = getControlLayer(comp);
+
+/**
+ * 
+ * @param {number} sliderVal 
+ * @returns 
+ */
+
 
     function connectPropertyToSlider(sliderVal) {
         var sliderProp = controlsLayer.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
@@ -140,6 +168,12 @@
         return 
     }
 
+
+/**
+ * 
+ * @param {number} angleVal 
+ * @returns 
+ */
 
     function connectPropertyToAngle(angleVal) {
         var angleProp = controlsLayer.property("ADBE Effect Parade").addProperty("ADBE Angle Control");
