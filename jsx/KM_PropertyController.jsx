@@ -12,6 +12,10 @@
 
 (function km_propertyController(thisObj) {
 
+    //// global UI variables
+    var editTextCharacters = 20;
+
+
     var comp = app.project.activeItem;
     // var sliderValue = prompt("Enter a slider value!", 100);
 
@@ -64,18 +68,65 @@
         win.orientation = 'column';
         win.alignChildren = ["fill", "top"];
 
-        var editGroup = win.add("group", undefined, "edit group");
+        var controlLayerGroup = win.add("panel", undefined,);
+        controlLayerGroup.orientation = 'row';
+        controlLayerGroup.alignChildren = ["fill", "fill"];
+        var controlLayerStatic = controlLayerGroup.add("statictext", undefined, "Control Layer Name:");
+        var controlLayerName = controlLayerGroup.add("edittext", undefined, "Enter control layer name");
+        controlLayerName.characters = editTextCharacters;
+
+
+        var controlEffectGroup = win.add("panel", undefined,);
+        controlEffectGroup.orientation = 'row';
+        controlEffectGroup.alignChildren = ["fill", "fill"];
+        var controlEffectStatic = controlEffectGroup.add("statictext", undefined, "Control Effect Name:");
+        var controlEffectName = controlEffectGroup.add("edittext", undefined, "Enter control effect name");
+        controlEffectName.characters = editTextCharacters;
+
+        var editGroup = win.add("panel", undefined,);
         editGroup.orientation = 'row';
         editGroup.alignChildren = ["fill", "fill"];
         var staticText = editGroup.add("statictext", undefined, "Number or Degrees:");
         var editField = editGroup.add("edittext", undefined, "Enter an integer");
-        editField.characters = 15;
+        editField.characters = editTextCharacters;
+
+        var colorGroup = win.add("panel", undefined,);
+        colorGroup.orientation = 'row';
+        colorGroup.alignChildren = ["fill", "fill"];
+        var colorStaticText = colorGroup.add("statictext", undefined, "Color hex code: ");
+        var hexEditField = colorGroup.add("edittext", undefined, "Enter an hex code");
+        hexEditField.characters = editTextCharacters; 
+
+
+        var checkboxGroup = win.add("panel", undefined, );
+        checkboxGroup.orientation = 'row';
+        checkboxGroup.alignChildren = ["fill", "fill"];
+        var cbStatic = checkboxGroup.add("statictext", undefined, "Checkbox values:")
+        var cbOnGroup = checkboxGroup.add("group", undefined, "CB On Group");
+        var cbOn = cbOnGroup.add("statictext", undefined, "On:");
+        var cbOnEdit = cbOnGroup.add("edittext", undefined, "100");
+        cbOnEdit.characters = 6;
+        var cbOffGroup = checkboxGroup.add("group", undefined, "CB Off Group");
+        var cbOff = cbOffGroup.add("statictext", undefined, "Off:");
+        var cbOffEdit = cbOffGroup.add("edittext", undefined, "0");
+        cbOffEdit.characters = 6;
 
         var buttonGrp = win.add("group", undefined, "button group");
-        buttonGrp.orientation = 'row';
+        buttonGrp.orientation = 'column';
         buttonGrp.alignChildren = ["fill", "fill"];
-        var sliderButton = buttonGrp.add("button", undefined, "Slider");
-        var angleButton = buttonGrp.add("button", undefined, "Angle");
+
+        var buttonsTop = buttonGrp.add("group", undefined, "Buttons Top");
+        buttonsTop.orientation = 'row';
+        buttonsTop.alignChildren = ["fill", "fill"];
+        var sliderButton = buttonsTop.add("button", undefined, "Slider");
+        var angleButton = buttonsTop.add("button", undefined, "Angle");
+
+        var buttonsBot = buttonGrp.add("group", undefined, "Buttons Top");
+        buttonsBot.orientation = 'row';
+        buttonsBot.alignChildren = ["fill", "fill"];
+        var colorButton = buttonsBot.add("button", undefined, "Color");
+        var checkBoxButton = buttonsBot.add("button", undefined, "Checkbox");
+
 
 
         sliderButton.onClick = function () {
@@ -91,6 +142,31 @@
             win.close();
             app.endUndoGroup()
         }
+        
+            function hexToRgb(hex) {
+                var bigint = parseInt(hex, 16);
+                var r = (bigint >> 16) & 255;
+                var g = (bigint >> 8) & 255;
+                var b = bigint & 255;
+
+                return (r / 255).toFixed(1) + "," + (g / 255).toFixed(1) + "," + (b / 255).toFixed(1);
+            }
+
+            var hexCode = hexToRgb(hexEditField.text);
+
+
+        colorButton.onClick = function () {
+            app.beginUndoGroup("Color Controller");
+
+
+            alert(hexCode)
+
+            connectPropertyToColor(hexCode);
+            win.close()
+            app.endUndoGroup()
+        }
+
+
 
         win.layout.layout();
         win.onResizing = win.onResize = function () {
@@ -188,5 +264,24 @@
         return 
     }
 
+
+
+
+    function connectPropertyToColor(hexCodeRGB) {
+        var colorProp = controlsLayer.property("ADBE Effect Parade").addProperty("ADBE Color Control");
+        colorProp.name = selectedProps[0].name;
+        colorProp.property(1).setValue([hexCodeRGB]);
+        
+
+        var props = selectedProps;
+        for (var i = 0; i < props.length; i++){
+                props[i].expression =
+                    'thisComp.layer("'+controlsLayer.name+'").effect("'+colorProp.name+'")(1).value'
+        }
+        return 
+    }
+
+
+    
 
 })(this);
