@@ -4,8 +4,8 @@
  * 
  * @title KM_PropertyController
  * @author Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.1.1
- * 5.24.2022
+ * @version 0.2.0
+ * 5.30.2022
  * 
  * 
 */
@@ -15,11 +15,7 @@
     //// global UI variables
     var editTextCharacters = 20;
 
-
     var comp = app.project.activeItem;
-    // var sliderValue = prompt("Enter a slider value!", 100);
-
-
 
     if (!(comp && comp instanceof CompItem)) {
         alert("Open a comp first!")
@@ -51,13 +47,12 @@
     createUI(thisObj);
 
 
-/**
- * 
- * @param {Object} thisObj
- * 
- *  
- */
-
+    /**
+     * 
+     * @param {Object} thisObj
+     * 
+     *  
+     */
     function createUI(thisObj) {
         var win = thisObj instanceof Panel
             ? thisObj
@@ -71,32 +66,35 @@
         var controlLayerGroup = win.add("panel", undefined,);
         controlLayerGroup.orientation = 'row';
         controlLayerGroup.alignChildren = ["fill", "fill"];
-        var controlLayerStatic = controlLayerGroup.add("statictext", undefined, "Control Layer Name:");
-        var controlLayerName = controlLayerGroup.add("edittext", undefined, "Enter control layer name");
+        var controlLayerStatic = controlLayerGroup.add("statictext", undefined, "Enter Control Layer Name:");
+        var controlLayerName = controlLayerGroup.add("edittext", undefined, "");
         controlLayerName.characters = editTextCharacters;
 
 
         var controlEffectGroup = win.add("panel", undefined,);
         controlEffectGroup.orientation = 'row';
         controlEffectGroup.alignChildren = ["fill", "fill"];
-        var controlEffectStatic = controlEffectGroup.add("statictext", undefined, "Control Effect Name:");
-        var controlEffectName = controlEffectGroup.add("edittext", undefined, "Enter control effect name");
+        var controlEffectStatic = controlEffectGroup.add("statictext", undefined, "Enter Control Effect Name:");
+        var controlEffectName = controlEffectGroup.add("edittext", undefined, "");
         controlEffectName.characters = editTextCharacters;
 
         var editGroup = win.add("panel", undefined,);
         editGroup.orientation = 'row';
         editGroup.alignChildren = ["fill", "fill"];
-        var staticText = editGroup.add("statictext", undefined, "Number or Degrees:");
-        var editField = editGroup.add("edittext", undefined, "Enter an integer");
+        var staticText = editGroup.add("statictext", undefined, "Enter a Number or Degrees:");
+        var editField = editGroup.add("edittext", undefined, "");
         editField.characters = editTextCharacters;
 
         var colorGroup = win.add("panel", undefined,);
         colorGroup.orientation = 'row';
         colorGroup.alignChildren = ["fill", "fill"];
-        var colorStaticText = colorGroup.add("statictext", undefined, "Color hex code: ");
-        var hexEditField = colorGroup.add("edittext", undefined, "Enter an hex code");
-        hexEditField.characters = editTextCharacters; 
-
+        var colorStaticText = colorGroup.add("statictext", undefined, "Enter RGB values: ");
+        var rgbEditField = colorGroup.add("edittext", undefined, "");
+        rgbEditField.characters = editTextCharacters; 
+        var colorHelpButton = colorGroup.add("button", undefined, "?");
+        colorHelpButton.helpTip = 'When entering numbers, make sure to leave a space between numbers';
+        colorHelpButton.size = [10, -1];
+        
 
         var checkboxGroup = win.add("panel", undefined, );
         checkboxGroup.orientation = 'row';
@@ -121,52 +119,87 @@
         var sliderButton = buttonsTop.add("button", undefined, "Slider");
         var angleButton = buttonsTop.add("button", undefined, "Angle");
 
+
         var buttonsBot = buttonGrp.add("group", undefined, "Buttons Top");
         buttonsBot.orientation = 'row';
         buttonsBot.alignChildren = ["fill", "fill"];
         var colorButton = buttonsBot.add("button", undefined, "Color");
         var checkBoxButton = buttonsBot.add("button", undefined, "Checkbox");
 
+        function getControlLayer(controlLayer) {
+            var numLayers = comp.numLayers;
 
+            for (var i = 1; i <= numLayers; i++) {
+                if (comp.layer(i).name === controlLayer) {
+                    return comp.layer(i)
+                } else {
+                    var newControlsLayer = comp.layers.addShape();
+                    newControlsLayer.name = controlLayer;
+                    return newControlsLayer
+
+                }
+            }
+
+        }
+
+        
 
         sliderButton.onClick = function () {
             app.beginUndoGroup("Slider Controller");
-            connectPropertyToSlider(parseInt(editField.text)) 
+
+            if (controlLayerName.text) {
+                var controlsLayer = getControlLayer(controlLayerName.text);
+            } else {
+                controlsLayer = getControlLayer("Controls")
+            }
+            alert(controlEffectName.text)
+            connectPropertyToSlider(parseInt(editField.text), controlsLayer.name, controlEffectName.text) 
             win.close();
             app.endUndoGroup()
         }
 
         angleButton.onClick = function () {
             app.beginUndoGroup("Angle Controller");
-            connectPropertyToAngle(parseInt(editField.text));
+            if (controlLayerName.text) {
+                var controlsLayer = getControlLayer(controlLayerName.text);
+            } else {
+                controlsLayer = getControlLayer("Controls")
+            }
+            connectPropertyToAngle(parseInt(editField.text), controlsLayer.name, controlEffectName.text);
             win.close();
             app.endUndoGroup()
         }
         
-            function hexToRgb(hex) {
-                var bigint = parseInt(hex, 16);
-                var r = (bigint >> 16) & 255;
-                var g = (bigint >> 8) & 255;
-                var b = bigint & 255;
-
-                return (r / 255).toFixed(1) + "," + (g / 255).toFixed(1) + "," + (b / 255).toFixed(1);
+        checkBoxButton.onClick = function () {
+            app.beginUndoGroup("Checkbox");
+            if (controlLayerName.text) {
+                var controlsLayer = getControlLayer(controlLayerName.text);
+            } else {
+                controlsLayer = getControlLayer("Controls")
             }
-
-            var hexCode = hexToRgb(hexEditField.text);
+            connectPropertyToCheckbox(parseInt(cbOffEdit.text), parseInt(cbOnEdit.text), controlsLayer.name, controlEffectName.text);
+            win.close();
+            app.endUndoGroup()
+        }
 
 
         colorButton.onClick = function () {
             app.beginUndoGroup("Color Controller");
-
-
-            alert(hexCode)
-
-            connectPropertyToColor(hexCode);
+            if (controlLayerName.text) {
+                var controlsLayer = getControlLayer(controlLayerName.text);
+            } else {
+                controlsLayer = getControlLayer("Controls")
+            }
+            connectPropertyToColor(rgbEditField.text, controlsLayer.name, controlEffectName.text);
             win.close()
             app.endUndoGroup()
         }
 
 
+        colorHelpButton.onClick = function () {
+            alert(colorHelp.helpTip)
+        }
+        
 
         win.layout.layout();
         win.onResizing = win.onResize = function () {
@@ -178,43 +211,24 @@
     }
 
 
-/**
- * 
- * @param {Object} comp 
- * @returns 
- */
-
-
-    function getControlLayer(comp) {
-        var numLayers = comp.numLayers;
-
-        for (var i = 1; i <= numLayers; i++){
-            if (comp.layer(i).name === "Controls") {
-                return comp.layer(i)
-            } else {
-                var controlsLayer = comp.layers.addShape();
-                controlsLayer.name = "Controls"
-                return controlsLayer
-
-            }
+    /**
+     *
+     *
+     * @param {Object} sliderVal slider value input
+     * @param {string} controls a string for the control layer name
+     * @param {string} propName a string for property name
+     * @returns slider value that has selected properties connected to it
+     * 
+     */
+    function connectPropertyToSlider(sliderVal, controls, propName) {
+        var sliderProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+        if (propName) {
+            sliderProp.name = propName
+        } else {
+            sliderProp.name = selectedProps[0].name;
         }
-
-    }
-
-    var controlsLayer = getControlLayer(comp);
-
-/**
- * 
- * @param {number} sliderVal 
- * @returns 
- */
-
-
-    function connectPropertyToSlider(sliderVal) {
-        var sliderProp = controlsLayer.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
-        sliderProp.name = selectedProps[0].name;
         sliderProp.property(1).setValue(sliderVal);
-        var sliderExpression = 'thisComp.layer("'+controlsLayer.name+'").effect("'+sliderProp.name+'")(1).value';
+        var sliderExpression = 'thisComp.layer("'+controls+'").effect("'+sliderProp.name+'")(1).value';
 
         var props = selectedProps;
         for (var i = 0; i < props.length; i++) {
@@ -245,43 +259,89 @@
     }
 
 
-/**
- * 
- * @param {number} angleVal 
- * @returns 
- */
-
-    function connectPropertyToAngle(angleVal) {
-        var angleProp = controlsLayer.property("ADBE Effect Parade").addProperty("ADBE Angle Control");
-        angleProp.name = selectedProps[0].name;
+    /**
+     *
+     *
+     * @param {Object} angleVal degrees for rotation value
+     * @param {string} controls a string for the control layer name
+     * @param {string} propName a string for property name
+     * @returns angle value that has selected properties connected to it
+     * 
+     */
+    function connectPropertyToAngle(angleVal, controls, propName) {
+        var angleProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Angle Control");
+        if (propName) {
+            angleProp.name = propName
+        } else {
+            angleProp.name = selectedProps[0].name;
+        }
         angleProp.property(1).setValue(angleVal);
 
         var props = selectedProps;
         for (var i = 0; i < props.length; i++){
                 props[i].expression =
-                    'thisComp.layer("'+controlsLayer.name+'").effect("'+angleProp.name+'")(1).value'
+                    'thisComp.layer("'+controls+'").effect("'+angleProp.name+'")(1).value'
         }
         return 
     }
 
 
-
-
-    function connectPropertyToColor(hexCodeRGB) {
-        var colorProp = controlsLayer.property("ADBE Effect Parade").addProperty("ADBE Color Control");
-        colorProp.name = selectedProps[0].name;
-        colorProp.property(1).setValue([hexCodeRGB]);
+    /**
+     *
+     *
+     * @param {string} rgbValues string that gets converted ot numbers to build rgb array
+     * @param {string} controls a string for the control layer name
+     * @param {string} propName a string for property name
+     * @returns color value that has selected properties connected to it
+     * 
+     */
+    function connectPropertyToColor(rgbValues, controls, propName) {
+        var colorProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Color Control");
+        if (propName) {
+            colorProp.name = propName
+        } else {
+            colorProp.name = selectedProps[0].name;
+        }
+        var rgbSplit = rgbValues.split(" ");
+        colorProp.property(1).setValue([parseFloat(rgbSplit[0])/ 255, parseFloat(rgbSplit[1])/ 255, parseFloat(rgbSplit[2]) / 255]);
         
-
         var props = selectedProps;
         for (var i = 0; i < props.length; i++){
                 props[i].expression =
-                    'thisComp.layer("'+controlsLayer.name+'").effect("'+colorProp.name+'")(1).value'
+                    'thisComp.layer("'+controls+'").effect("'+colorProp.name+'")(1).value'
+        }
+        return
+    }
+
+    /**
+     *
+     *
+     * @param {Object} minVal minimum value for checkbox in UI
+     * @param {Object} maxVal maximum value for checkbox in UI
+     * @param {string} controls a string for the control layer name
+     * @param {string} propName a string for property name
+     * @returns  value that has selected properties connected to it
+     * 
+     * 
+     */
+    function connectPropertyToCheckbox(minVal, maxVal, controls, propName) {
+        var checkboxProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+        if (propName) {
+            checkboxProp.name = propName
+        } else {
+            checkboxProp.name = selectedProps[0].name;
+        }
+        checkboxProp.property(1).setValue(true);
+
+        var props = selectedProps;
+        for (var i = 0; i < props.length; i++) {
+            props[i].expression =
+                'var checkBoxCtrl = thisComp.layer("'+controls+'").effect("'+checkboxProp.name+'")(1).value\
+            checkBoxCtrl == 1 ? '+maxVal+' : '+minVal+''
         }
         return 
     }
 
 
-    
 
 })(this);
