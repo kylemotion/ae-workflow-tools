@@ -13,57 +13,53 @@
 
    
     var activeSelection = app.project.selection;
+    if (!activeSelection) {
+        alert("Select one or more comps in your project panel first");
+        return
+    }
 
-
-    //// GLOBAL FUNCTIONS
-        
     function getActiveSelection() {
         var compNameArray = new Array();
-        if (activeSelection.length != null) {
+
             for (var i = 0; i < activeSelection.length; i++) {
                 if (activeSelection[i] instanceof CompItem) {
                     compNameArray.push(activeSelection[i])
                 }
             }
-
              return compNameArray
-
-        } 
-           
     }
 
-    function getActiveComp() {
-        var activeComp = app.project.activeItem;
-
-        if (activeComp && activeComp instanceof CompItem) {
-            return activeComp
-        } 
-    }
-
-    alert(getActiveComp().name)
-    
     var compSelection = getActiveSelection();
-    var activeComp = getActiveComp();
+    
+
 
     function addToRenderQueue(compsSelected) {
         var renderQueue = app.project.renderQueue;
         while (renderQueue.numItems > 0) {
             renderQueue.item(1).remove();
         }
-        
         for (var i = 0; i < compsSelected.length; i++) {
-            renderQueue.items.add(compsSelected[i]);
+            if (compsSelected[i] instanceof CompItem) {
+                renderQueue.items.add(compsSelected[i]);
+            }
         }
 
     }
+
+    var activeComp = app.project.activeItem;
     
         app.beginUndoGroup("remove and add items from Render queue");
 
         if (compSelection.length > 1) {
             addToRenderQueue(compSelection)
-        } else {
-            addToRenderQueue(activeComp)
+        } 
+
+
+        if (activeComp && activeComp instanceof CompItem) {
+            app.project.renderQueue.items.add(activeComp)
         }
+
+
     
         app.endUndoGroup();
     
@@ -82,14 +78,11 @@
                 resizeable: true    
             })
 
-
-        // var w = (thisObj instanceof Panel) ? thisObj : new Window("palette", scriptName)
-        var mainWindow = win.add("group", undefined, "Main Window")
-        mainWindow.orientation = "column";
-        mainWindow.alignChildren = ["left", "fill"];
+        win.orientation = 'column';
+        win.alignChildren = ["fill", "fill"];
 
 
-        var headerGroup = mainWindow.add("group", undefined, "headerGroup")
+        var headerGroup = win.add("group", undefined, "headerGroup")
         headerGroup.orientation = "row";
         headerGroup.spacing = 85;
         var headerButton = headerGroup.add("image", undefined, renderHelperHeader);
@@ -97,7 +90,7 @@
             
 
         // ----- A panel  for setting the save location of your render ------
-        var saveLocationPanel = mainWindow.add("panel", undefined, "Output Location");
+        var saveLocationPanel = win.add("panel", undefined, "Output Location");
         saveLocationPanel.orientation = 'row';
         var saveLocationChange = saveLocationPanel.add("EditText", undefined, 'Click Button To Update');
         saveLocationChange.preferredSize = [panelWidth, textFieldHeight]
@@ -111,7 +104,7 @@
 
         // ----- A panel for setting the output modules and application used for your render ------
 
-        var renderSettingsButtonPanel = mainWindow.add("panel", undefined, "Output Module");
+        var renderSettingsButtonPanel = win.add("panel", undefined, "Output Module");
         renderSettingsButtonPanel.orientation = "column";
         var renderAppGroup = renderSettingsButtonPanel.add("group", undefined, "render app");
         renderAppGroup.orientation = "row";
@@ -126,7 +119,7 @@
 
         // ----- A panel for setting the output name used for your render ------
 
-        var saveNamePanel = mainWindow.add("panel", undefined, "Output Name");
+        var saveNamePanel = win.add("panel", undefined, "Output Name");
         saveNamePanel.orientation = 'column';
         saveNamePanel.preferredSize = [250, 100];
         saveNamePanel.spacing = 20;
@@ -146,7 +139,7 @@
         renderNameChange.text = renderNameEdit.text;
         renderNameEdit.onChanging = function () { renderNameChange.text = renderNameEdit.text };
 
-        var renderGroup = mainWindow.add("panel", undefined, "Render Me");
+        var renderGroup = win.add("panel", undefined, "Render Me");
         renderGroup.orientation = 'row';
         renderGroup.preferredSize = [250, 75];
         renderGroup.spacing = 10;
@@ -154,7 +147,7 @@
         renderButton.size = [200, 30];
         renderButton.alignment = ["center", ""];
 
-        var helpGroup = mainWindow.add("group", undefined, "Help Me");
+        var helpGroup = win.add("group", undefined, "Help Me");
         renderGroup.orientation = 'row';
         helpGroup.alignment = ["right", "top"];
         var helpButton = helpGroup.add("button", undefined, "?");
@@ -197,12 +190,12 @@
             renderButton.active = false;
             if (renderInAEButton.value == true) {
                 startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text);
-                mainWindow.close()
+                win.close()
                 alert("Render complete!\nComps rendered to:" + "\n" + saveLocationChange.text);
                 return
             } else {
                 alert("Launching Adobe Media Encoder\nRendering will start automatically\nComps rendered to:" + "\n" + saveLocationChange.text);
-                mainWindow.close();
+                win.close();
                 startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text);
                 var renderQueue = app.project.renderQueue;
                 while (renderQueue.numItems > 0) {
