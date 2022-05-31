@@ -2,8 +2,8 @@
  * Speeds up render process without having to go through the render queue
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.1.7
- * 5.13.2022
+ * @version 0.2.0
+ * 5.31.2022
  * 
  * 
 */
@@ -12,55 +12,52 @@
 (function km_renderHelper(thisObj){
 
    
-    var activeSelection = app.project.selection;
-    if (!activeSelection) {
-        alert("Select one or more comps in your project panel first");
-        return
-    }
+        var activeSelection = app.project.selection;
+        if (!activeSelection) {
+            alert("Select one or more comps in your project panel first");
+            return
+        }
 
-    function getActiveSelection() {
-        var compNameArray = new Array();
+        function getActiveSelection() {
+            var compNameArray = new Array();
 
-            for (var i = 0; i < activeSelection.length; i++) {
-                if (activeSelection[i] instanceof CompItem) {
-                    compNameArray.push(activeSelection[i])
+                for (var i = 0; i < activeSelection.length; i++) {
+                    if (activeSelection[i] instanceof CompItem) {
+                        compNameArray.push(activeSelection[i])
+                    }
                 }
-            }
-             return compNameArray
-    }
-
-    var compSelection = getActiveSelection();
-    
-
-
-    function addToRenderQueue(compsSelected) {
-        var renderQueue = app.project.renderQueue;
-        while (renderQueue.numItems > 0) {
-            renderQueue.item(1).remove();
-        }
-        for (var i = 0; i < compsSelected.length; i++) {
-            if (compsSelected[i] instanceof CompItem) {
-                renderQueue.items.add(compsSelected[i]);
-            }
+                return compNameArray
         }
 
-    }
+        var compSelection = getActiveSelection();
+        
+        var activeComp = app.project.activeItem;
 
-    var activeComp = app.project.activeItem;
+        function addToRenderQueue(compsSelected) {
+            var renderQueue = app.project.renderQueue;
+            while (renderQueue.numItems > 0) {
+                renderQueue.item(1).remove();
+            }
+
+            if (compsSelected.length > 1) {
+                for (var i = 0; i < compsSelected.length; i++) {
+                    if (compsSelected[i] instanceof CompItem) {
+                        renderQueue.items.add(compsSelected[i]);
+                    }
+                }
+            } else if(activeComp && activeComp instanceof CompItem){
+                renderQueue.items.add(activeComp)
+            }
+
+            return renderQueue
+
+        }
+
     
         app.beginUndoGroup("remove and add items from Render queue");
-
-        if (compSelection.length > 1) {
+        
             addToRenderQueue(compSelection)
-        } 
-
-
-        if (activeComp && activeComp instanceof CompItem) {
-            app.project.renderQueue.items.add(activeComp)
-        }
-
-
-    
+        
         app.endUndoGroup();
     
     createUI(thisObj)
@@ -84,7 +81,6 @@
 
         var headerGroup = win.add("group", undefined, "headerGroup")
         headerGroup.orientation = "row";
-        headerGroup.spacing = 85;
         var headerButton = headerGroup.add("image", undefined, renderHelperHeader);
         var logoButton = headerGroup.add("image", undefined, gmLogo);
             
@@ -92,6 +88,7 @@
         // ----- A panel  for setting the save location of your render ------
         var saveLocationPanel = win.add("panel", undefined, "Output Location");
         saveLocationPanel.orientation = 'row';
+        saveLocationPanel.alignChildren = ["fill", "fill"];
         var saveLocationChange = saveLocationPanel.add("EditText", undefined, 'Click Button To Update');
         saveLocationChange.preferredSize = [panelWidth, textFieldHeight]
         var folderPath = "~/Desktop";
@@ -106,13 +103,13 @@
 
         var renderSettingsButtonPanel = win.add("panel", undefined, "Output Module");
         renderSettingsButtonPanel.orientation = "column";
+        renderSettingsButtonPanel.alignChildren = ["fill", "fill"]
         var renderAppGroup = renderSettingsButtonPanel.add("group", undefined, "render app");
         renderAppGroup.orientation = "row";
         var renderInAEButton = renderAppGroup.add('radiobutton', undefined, "Render in AE");
         renderInAEButton.value = true;
         var renderInAMEButton = renderAppGroup.add('radiobutton', undefined, "Render in AME");
         var renderSettingsDropdown = renderSettingsButtonPanel.add("dropdownlist", undefined, "");
-        renderSettingsDropdown.alignment = 'center';
         renderSettingsDropdown.selection = 0;
         renderSettingsDropdown.size = [200, textFieldHeight];
 
@@ -121,9 +118,7 @@
 
         var saveNamePanel = win.add("panel", undefined, "Output Name");
         saveNamePanel.orientation = 'column';
-        saveNamePanel.preferredSize = [250, 100];
-        saveNamePanel.spacing = 20;
-        saveNamePanel.alignChildren = "left";
+        saveNamePanel.alignChildren = ["fill", "fill"]
         var renderNameGroup = saveNamePanel.add("group", undefined, "Render Name Options");
         renderNameGroup.orientation = "column";
         renderNameGroup.alignChildren = "left";
@@ -131,9 +126,17 @@
         var compNameButton = renderNameButtonGroup.add("RadioButton", undefined, "Comp Name");
         compNameButton.value = true;
         var customNameButton = renderNameButtonGroup.add("RadioButton", undefined, "Custom Name");
-        var renderNameEdit = saveNamePanel.add("EditText", [0, 0, panelWidth, textFieldHeight], "Enter a custom render name");
+        var renderNameEdit = saveNamePanel.add("EditText", [0, 0, panelWidth, textFieldHeight], "");
+        renderNameEdit.text = compSelection[0].name;
         renderNameEdit.characters = 25;
         var renderNameChange = saveNamePanel.add("StaticText", undefined, '');
+
+        compNameButton.onClick = function () {
+            renderNameEdit.text = compSelection[0].name
+        }
+        customNameButton.onClick = function () {
+            renderNameEdit.text = "Enter a custom render file name"
+        }  
 
         renderNameChange.characters = renderNameEdit.characters;
         renderNameChange.text = renderNameEdit.text;
@@ -141,11 +144,9 @@
 
         var renderGroup = win.add("panel", undefined, "Render Me");
         renderGroup.orientation = 'row';
-        renderGroup.preferredSize = [250, 75];
-        renderGroup.spacing = 10;
+        renderGroup.alignChildren = ["fill", "fill"];
         var renderButton = renderGroup.add("button", undefined, "Render");
-        renderButton.size = [200, 30];
-        renderButton.alignment = ["center", ""];
+
 
         var helpGroup = win.add("group", undefined, "Help Me");
         renderGroup.orientation = 'row';
@@ -169,6 +170,34 @@
             alert("How to use:\nSet your destination folder.\nSelect your Output Module.\nEnter your clip name.\nClick Render.")
         }
     
+
+        function renderOutputModules() {
+            var outputModuleTemplates = [];
+            var renderQueue = app.project.renderQueue;
+            var outputModules = renderQueue.item(1).outputModule(1).templates;
+            for (var i = 0; i < outputModules.length; i++) {
+                outputModuleTemplates.push(outputModules[i])
+            }
+            return outputModuleTemplates
+        }
+
+        var renderModules = renderOutputModules();
+
+        function populateOutputModules(renderSettingsList) {
+            renderSettingsList.removeAll();
+
+            for (var i = 0; i < renderModules.length; i++) {
+                if (!(renderModules[i].toString().split(" ")[0] === "_HIDDEN")) {
+                    renderSettingsList.add("item", renderModules[i])
+                }
+            }
+
+            return renderSettingsList
+        }
+
+
+
+
         if (renderInAEButton.value == true) {
             populateOutputModules(renderSettingsDropdown);
             renderSettingsDropdown.selection = 0
@@ -189,14 +218,13 @@
             app.beginUndoGroup("render");
             renderButton.active = false;
             if (renderInAEButton.value == true) {
-                startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text);
+                startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text, saveLocationChange.text, renderInAEButton.value);
+                alert("Render complete!\nComps rendered to:" + "\n" + saveLocationChange.text)
                 win.close()
-                alert("Render complete!\nComps rendered to:" + "\n" + saveLocationChange.text);
                 return
             } else {
-                alert("Launching Adobe Media Encoder\nRendering will start automatically\nComps rendered to:" + "\n" + saveLocationChange.text);
                 win.close();
-                startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text);
+                startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text, saveLocationChange.text, renderInAEButton.value);
                 var renderQueue = app.project.renderQueue;
                 while (renderQueue.numItems > 0) {
                     renderQueue.item(1).remove();
@@ -217,69 +245,54 @@
         
     }
 
-    ///// helper functions ///////
-
-
-            function renderOutputModules() {
-                var outputModuleTemplates = [];
-                var renderQueue = app.project.renderQueue;
-                var outputModules = renderQueue.item(1).outputModule(1).templates;
-                for (var i = 0; i < outputModules.length; i++) {
-                    outputModuleTemplates.push(outputModules[i])
-                }
-                return outputModuleTemplates
-            }
-
-
-
-      
-        
-            function populateOutputModules(renderSettingsList) {
-                renderSettingsList.removeAll();
-
-                        for (var i = 0; i < renderOutputModules().length; i++) {
-                            if (!(renderOutputModules()[i].toString().split(" ")[0] === "_HIDDEN")) {
-                                renderSettingsList.add("item", renderOutputModules()[i])
-                            }
-                        }
-
-                return renderSettingsList
-                    }
-
-            function startRenderProcess(renderSettingsList, compName, output) {
-
-                var renderSettings = renderSettingsList.selection.toString();
+    
+    /**
+     *
+     *
+     * @param {Object} renderSettingsList
+     * @param {string} compNameOutput
+     * @param {string} customOutput
+     * @param {string} saveLocation
+     * @param {Object} AERender
+     * @return starts render process
+     *  
+     */
+    function startRenderProcess(renderSettingsList, compNameOutput, customOutput, saveLocation, AERender) {
 
         
-                var renderQueue = app.project.renderQueue;
-                for (var b = 1; b <= renderQueue.numItems; b++) {
-                    var outputFolder = saveLocationChange.text;
-                    if (compName == true) {
-                        var outputName = renderQueue.item(b).comp.name;
-                    } else {
-                        var outputName = output + "-" + b;
-                    }
-                    var outputModule = renderQueue.item(b).outputModule(1);
-                    outputModule.applyTemplate(renderSettings);
-                    outputModule.file = File(outputFolder + "/" + outputName);
-                }
-
-
-                if (renderInAEButton.value == true) {
-                    return renderQueue.render();
-                } else {
-                    var bt = new BridgeTalk();
-                    if (!BridgeTalk.isRunning("ame")) {
-                        BridgeTalk.launch("ame", "background");
-                    }
-                    return renderQueue.queueInAME(true)
-                }
+        var renderQueue = app.project.renderQueue;
+        for (var b = 1; b <= renderQueue.numItems; b++) {
+            var outputFolder = saveLocation;
+            if (compNameOutput == true) {
+                var outputName = renderQueue.item(b).comp.name;
+            } else {
+                outputName = customOutput
             }
-    
-    
-           
-    
-    
+
+            var outputModule = renderQueue.item(b).outputModule(1);
+
+            if (AERender == true) {
+                var renderSettingsName = renderSettingsList.selection.toString();
+            } else {
+                renderSettingsName = outputModule.templates[0]
+            }
+
+            outputModule.applyTemplate(renderSettingsName);
+            outputModule.file = File(outputFolder + "/" + outputName);
+        }
+
+
+        if (AERender == true) {
+            return renderQueue.render();
+        } else {
+            alert("Launching Adobe Media Encoder\nRendering will start automatically\nComps rendered to:" + "\n" + saveLocation);
+            var bt = new BridgeTalk();
+            if (!BridgeTalk.isRunning("ame")) {
+                BridgeTalk.launch("ame", "background");
+            }
+            return renderQueue.queueInAME(true)
+        }
+    }
     
 })(this)
     
