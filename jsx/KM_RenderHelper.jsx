@@ -138,12 +138,12 @@
         compNameButton.value = true;
         var customNameButton = renderNameButtonGroup.add("RadioButton", undefined, "Custom Name");
         var renderNameEdit = saveNamePanel.add("EditText", [0, 0, panelWidth, textFieldHeight], "");
-        renderNameEdit.text = renderQueue.item(1).name;
+        renderNameEdit.text = renderQueue.item(1).comp.name;
         renderNameEdit.characters = 25;
         var renderNameChange = saveNamePanel.add("StaticText", undefined, '');
 
         compNameButton.onClick = function () {
-            renderNameEdit.text = renderQueue.item(1).name;
+            renderNameEdit.text = renderQueue.item(1).comp.name;
         }
         customNameButton.onClick = function () {
             renderNameEdit.text = "Enter a custom render file name"
