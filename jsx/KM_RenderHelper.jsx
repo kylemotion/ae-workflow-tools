@@ -2,7 +2,7 @@
  * Speeds up render process without having to go through the render queue
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.2
+ * @version 0.2.3
  * 5.31.2022
  * 
  * 
@@ -58,6 +58,11 @@
             addToRenderQueue(compSelection)
         
         app.endUndoGroup();
+    
+    
+    
+    var renderQueue = app.project.renderQueue;
+    
     
     createUI(thisObj)
 
@@ -133,12 +138,12 @@
         compNameButton.value = true;
         var customNameButton = renderNameButtonGroup.add("RadioButton", undefined, "Custom Name");
         var renderNameEdit = saveNamePanel.add("EditText", [0, 0, panelWidth, textFieldHeight], "");
-        renderNameEdit.text = compSelection[0].name;
+        renderNameEdit.text = renderQueue.item(1).name;
         renderNameEdit.characters = 25;
         var renderNameChange = saveNamePanel.add("StaticText", undefined, '');
 
         compNameButton.onClick = function () {
-            renderNameEdit.text = compSelection[0].name
+            renderNameEdit.text = renderQueue.item(1).name;
         }
         customNameButton.onClick = function () {
             renderNameEdit.text = "Enter a custom render file name"
@@ -265,7 +270,6 @@
     function startRenderProcess(renderSettingsList, compNameOutput, customOutput, saveLocation, AERender) {
 
         
-        var renderQueue = app.project.renderQueue;
         for (var b = 1; b <= renderQueue.numItems; b++) {
             var outputFolder = saveLocation;
             if (compNameOutput == true) {
