@@ -4,8 +4,8 @@
  * 
  * @title KM_PropertyController
  * @author Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.0
- * 5.30.2022
+ * @version 0.2.1
+ * 5.31.2022
  * 
  * 
 */
@@ -152,7 +152,6 @@
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            alert(controlEffectName.text)
             connectPropertyToSlider(parseInt(editField.text), controlsLayer.name, controlEffectName.text) 
             win.close();
             app.endUndoGroup()
@@ -166,18 +165,6 @@
                 controlsLayer = getControlLayer("Controls")
             }
             connectPropertyToAngle(parseInt(editField.text), controlsLayer.name, controlEffectName.text);
-            win.close();
-            app.endUndoGroup()
-        }
-        
-        checkBoxButton.onClick = function () {
-            app.beginUndoGroup("Checkbox");
-            if (controlLayerName.text) {
-                var controlsLayer = getControlLayer(controlLayerName.text);
-            } else {
-                controlsLayer = getControlLayer("Controls")
-            }
-            connectPropertyToCheckbox(parseInt(cbOffEdit.text), parseInt(cbOnEdit.text), controlsLayer.name, controlEffectName.text);
             win.close();
             app.endUndoGroup()
         }
@@ -198,6 +185,20 @@
 
         colorHelpButton.onClick = function () {
             alert(colorHelp.helpTip)
+        }
+
+
+
+        checkBoxButton.onClick = function () {
+            app.beginUndoGroup("Checkbox");
+            if (controlLayerName.text) {
+                var controlsLayer = getControlLayer(controlLayerName.text);
+            } else {
+                controlsLayer = getControlLayer("Controls")
+            }
+            connectPropertyToCheckbox(parseInt(cbOffEdit.text), parseInt(cbOnEdit.text), controlsLayer.name, controlEffectName.text);
+            win.close();
+            app.endUndoGroup()
         }
         
 
@@ -233,21 +234,22 @@
         var props = selectedProps;
         for (var i = 0; i < props.length; i++) {
 
-                if (props[i].propertyValueType == 6413) {
-                    props[i].expression = '['+sliderExpression+','+sliderExpression+','+sliderExpression+']';
+                if (props[i].propertyValueType == 6413 || props[i].propertyValueType == 6414) {
+                    props[i].expression =
+'x = '+sliderExpression+';\
+y = '+sliderExpression+';\
+z = '+sliderExpression+';\
+[x,y,z]';
                 }
             
-                if (props[i].propertyValueType == 6414) {
-                    props[i].expression = '['+ sliderExpression+', '+sliderExpression+','+sliderExpression+']';
-                }
             
-                if (props[i].propertyValueType == 6415) {
-                    props[i].expression = '['+sliderExpression+', '+sliderExpression+']';
+                if (props[i].propertyValueType == 6415 || props[i].propertyValueType == 6416) {
+                    props[i].expression =
+'x = '+ sliderExpression+';\
+y = '+ sliderExpression+';\
+[x,y]';
                 }
-            
-                if (props[i].propertyValueType == 6416) {
-                    props[i].expression = '['+sliderExpression+'", "'+sliderExpression+']';
-                }
+        
             
                 if (props[i].propertyValueType == 6417) {
                     props[i].expression =
@@ -289,7 +291,7 @@
     /**
      *
      *
-     * @param {string} rgbValues string that gets converted ot numbers to build rgb array
+     * @param {Object} rgbValues string that gets converted ot numbers to build rgb array
      * @param {string} controls a string for the control layer name
      * @param {string} propName a string for property name
      * @returns color value that has selected properties connected to it
@@ -304,6 +306,7 @@
         }
         var rgbSplit = rgbValues.split(" ");
         colorProp.property(1).setValue([parseFloat(rgbSplit[0])/ 255, parseFloat(rgbSplit[1])/ 255, parseFloat(rgbSplit[2]) / 255]);
+        
         
         var props = selectedProps;
         for (var i = 0; i < props.length; i++){
