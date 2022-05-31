@@ -2,7 +2,7 @@
  * Speeds up render process without having to go through the render queue
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.0
+ * @version 0.2.2
  * 5.31.2022
  * 
  * 
@@ -52,7 +52,6 @@
             return renderQueue
 
         }
-
     
         app.beginUndoGroup("remove and add items from Render queue");
         
@@ -89,9 +88,16 @@
         var saveLocationPanel = win.add("panel", undefined, "Output Location");
         saveLocationPanel.orientation = 'row';
         saveLocationPanel.alignChildren = ["fill", "fill"];
-        var saveLocationChange = saveLocationPanel.add("EditText", undefined, 'Click Button To Update');
-        saveLocationChange.preferredSize = [panelWidth, textFieldHeight]
-        var folderPath = "~/Desktop";
+        var saveLocationChange = saveLocationPanel.add("statictext", undefined, 'Click Button To Update');
+        saveLocationChange.preferredSize = [panelWidth, textFieldHeight];
+        if ($.os.indexOf("Windows") != -1) {
+            folderPath = "C:\\Users\\" + system.userName + "\\Desktop"
+        } else {
+            var folderPath = "~/Desktop";
+        }
+
+        
+        
         saveLocationChange.text = folderPath;
 
         var changeLocationButtonGroup = saveLocationPanel.add("group", undefined, "Save Location Top");
@@ -215,7 +221,6 @@
         }
 
         renderButton.onClick = function () {
-            app.beginUndoGroup("render");
             renderButton.active = false;
             if (renderInAEButton.value == true) {
                 startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text, saveLocationChange.text, renderInAEButton.value);
@@ -232,7 +237,7 @@
                 return
 
             }
-            app.endUndoGroup();
+            
         }
 
         win.layout.layout();
