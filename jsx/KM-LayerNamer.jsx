@@ -1,4 +1,11 @@
-
+/**
+ * 
+ * renames layers in batches
+ * 
+ * @author: Kyle Harter <k.harter@glassandmarker.com>
+ * @version 0.2.1
+ * 6.1.2022
+ */
 
 
 (function km_layerRenamer(thisObj) {
