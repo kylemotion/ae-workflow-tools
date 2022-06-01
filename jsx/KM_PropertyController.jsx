@@ -78,12 +78,12 @@
         var controlEffectName = controlEffectGroup.add("edittext", undefined, "");
         controlEffectName.characters = editTextCharacters;
 
-        var editGroup = win.add("panel", undefined,);
-        editGroup.orientation = 'row';
-        editGroup.alignChildren = ["fill", "fill"];
-        var staticText = editGroup.add("statictext", undefined, "Enter a Number or Degrees:");
-        var editField = editGroup.add("edittext", undefined, "");
-        editField.characters = editTextCharacters;
+        var sliderEditGroup = win.add("panel", undefined,);
+        sliderEditGroup.orientation = 'row';
+        sliderEditGroup.alignChildren = ["fill", "fill"];
+        var sliderStaticText = sliderEditGroup.add("statictext", undefined, "Enter a Number or Degrees:");
+        var sliderEditField = sliderEditGroup.add("edittext", undefined, "");
+        sliderEditField.characters = editTextCharacters;
 
         var colorGroup = win.add("panel", undefined,);
         colorGroup.orientation = 'row';
@@ -147,24 +147,36 @@
         sliderButton.onClick = function () {
             app.beginUndoGroup("Slider Controller");
 
+            if (sliderEditField.text == "") {
+                alert("Please enter a valid integer");
+                return
+            }
+
+
             if (controlLayerName.text) {
                 var controlsLayer = getControlLayer(controlLayerName.text);
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToSlider(parseInt(editField.text), controlsLayer.name, controlEffectName.text) 
+            connectPropertyToSlider(parseInt(sliderEditField.text), controlsLayer.name, controlEffectName.text) 
             win.close();
             app.endUndoGroup()
         }
 
         angleButton.onClick = function () {
             app.beginUndoGroup("Angle Controller");
+
+            if (sliderEditField.text == "") {
+                alert("Please enter a valid integer");
+                return
+            }
+
             if (controlLayerName.text) {
                 var controlsLayer = getControlLayer(controlLayerName.text);
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToAngle(parseInt(editField.text), controlsLayer.name, controlEffectName.text);
+            connectPropertyToAngle(parseInt(sliderEditField.text), controlsLayer.name, controlEffectName.text);
             win.close();
             app.endUndoGroup()
         }
@@ -172,6 +184,12 @@
 
         colorButton.onClick = function () {
             app.beginUndoGroup("Color Controller");
+
+            if (rgbEditField.text == "") {
+                alert("Please enter a valid integer");
+                return
+            }
+
             if (controlLayerName.text) {
                 var controlsLayer = getControlLayer(controlLayerName.text);
             } else {
@@ -184,13 +202,19 @@
 
 
         colorHelpButton.onClick = function () {
-            alert(colorHelp.helpTip)
+            alert(colorHelpButton.helpTip)
         }
 
 
 
         checkBoxButton.onClick = function () {
             app.beginUndoGroup("Checkbox");
+
+            if (cbOffEdit.text == "" || cbOnEdit.text == "") {
+                alert("Please enter a valid integer");
+                return
+            }
+            
             if (controlLayerName.text) {
                 var controlsLayer = getControlLayer(controlLayerName.text);
             } else {
