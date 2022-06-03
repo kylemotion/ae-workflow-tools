@@ -2,14 +2,22 @@
  * Creates color palette based on submitted hex codes
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.1
- * 6.1.2022
+ * @version 0.2.2
+ * 6.3.2022
  * 
  * 
 */
 
 
 (function colorPaletteGenerator() {
+
+    var existingComp = app.project.activeItem;
+    if (!(existingComp && existingComp instanceof CompItem)) {
+        alert("Please open a comp first!");
+        return
+    }
+
+
     var mainWindow = new Window("window", "Color Palette Generator", undefined);
     mainWindow.orientation = 'column';
     mainWindow.alignChildren = ["fill", "fill"];
@@ -38,20 +46,11 @@
             'squareSize': 100
         }
         
-        createColorPaletteComp(editBox, squareParams)
+        createColorPaletteComp(editBox.text, squareParams)
         mainWindow.close();
         app.endUndoGroup()
     }
 
-    function getCurrentComp() {
-        var existingComp = app.project.activeItem
-        if (existingComp && existingComp instanceof CompItem) {
-            existingComp.openInViewer()
-            return existingComp
-        } else {
-            alert("Select a composition first")
-        }
-    }
     function getPreCompFolderName() {
         var folderName = "02 PreComps";
         if (typeof folderName === "string") {
@@ -77,19 +76,39 @@
 
     }
 
-    function colorControlArray(editBox) {
-        var lineArray = new Array();
-        var lineAmount = editBox.text.split("\n");
-        for (var i = 0; i < lineAmount.length; i++) {
-            lineArray.push(lineAmount[i])
-        }
+    // function lineArray(editBox) {
+    //     var lineArray = new Array();
+    //     var lineAmount = editBox.text.split("\n");
+    //     for (var i = 0; i < lineAmount.length; i++) {
+    //         lineArray.push(lineAmount[i])
+    //     }
+    //     return lineArray
+    // }
 
-        return lineArray
-    }
+
+    function hexToRGB(editBox) {
+        var colorArray = new Array();
+        var list = editBox.trim();
+        var lineAmount = list.split("\n");
+        for (var i = 0; i < lineAmount.length; i++) {
+            var hexString = lineAmount[i];
+            var newString = hexString.replace(/[#]/g,"");
+            var hexColor = "0x" + newString;
+                var r = hexColor >> 16;
+                var g = (hexColor & 0x00ff00) >> 8;
+                var b = hexColor & 0xff;
+                colorArray.push([r / 255, g / 255, b / 255]);
+            }
+
+        return colorArray
+    } 
+
+
 
     function createColorPaletteComp(editBox, squareParams) {
-        var comp = getCurrentComp();
-        var colorPalComp = app.project.items.addComp("Color Palette", (colorControlArray(editBox).length * squareParams.squareSize), squareParams.squareSize, 1.0, comp.duration, 24);
+        var comp = existingComp;
+        var colorArray = hexToRGB(editBox);
+        var colorPalComp = app.project.items.addComp("Color Palette", (colorArray.length * squareParams.squareSize), squareParams.squareSize, 1.0, comp.duration, 24);
         var colorPalFolder = app.project.items.addFolder("Color Palette Comp");
         colorPalComp.parentFolder = colorPalFolder;
         colorPalFolder.parentFolder = getPreCompFolderName()[0];
@@ -98,14 +117,13 @@
         var colorControls = colorComp.layers.addShape();
         colorControls.name = "Color Controls";
         colorControls.property("ADBE Transform Group").property("ADBE Position").setValue([0, squareParams.squareSize]);
-        var lineArray = colorControlArray(editBox);
+        // var lineArray = lineArray(editBox);
 
-        for (var i = 0; i < lineArray.length; i++) {
+        for (var i = 0; i < colorArray.length; i++) {
             var colorControlEffect = colorControls.property("ADBE Effect Parade").addProperty("ADBE Color Control");
             var count = i + 1;
             colorControlEffect.name = "Color-" + count;
-            colorControlEffect.property(1).expression =
-                'hexToRgb("' + lineArray[i] + '")'
+            colorControlEffect.property(1).setValue(colorArray[i])
             var colorSquare = colorComp.layers.addShape();
             colorSquare.name = "Color-" + count;
             var contents = colorSquare.property("ADBE Root Vectors Group");
@@ -117,9 +135,6 @@
             var rectSize = shapeRect.property("ADBE Vector Rect Size");
             rectSize.setValue([squareParams.squareSize, squareParams.squareSize]);
             var rectPos = shapeRect.property("ADBE Vector Rect Position");
-            /*     rectPos.expression = 'x = 0;\
-                                    y = 0;\
-                                    [x, y]'; */
             colorSquare.label = 3;
             colorSquare.parent = colorComp.layer("Color Controls");
             var colorTrans = colorSquare.property("ADBE Transform Group");
