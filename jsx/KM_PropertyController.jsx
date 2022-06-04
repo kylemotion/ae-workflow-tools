@@ -4,8 +4,8 @@
  * 
  * @title KM_PropertyController
  * @author Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.1
- * 5.31.2022
+ * @version 0.2.2
+ * 6.4.2022
  * 
  * 
 */
@@ -79,52 +79,57 @@
         controlEffectName.characters = editTextCharacters;
 
         var sliderEditGroup = win.add("panel", undefined,);
-        sliderEditGroup.orientation = 'row';
+        sliderEditGroup.orientation = 'column';
         sliderEditGroup.alignChildren = ["fill", "fill"];
-        var sliderStaticText = sliderEditGroup.add("statictext", undefined, "Enter a Number or Degrees:");
-        var sliderEditField = sliderEditGroup.add("edittext", undefined, "");
+        var sliderTopGroup = sliderEditGroup.add("group", undefined, "Slider top");
+        sliderTopGroup.orientation = 'row';
+        sliderTopGroup.alignChildren = ["fill", "fill"]
+        var sliderStaticText = sliderTopGroup.add("statictext", undefined, "Enter a slider value:");
+        var sliderEditField = sliderTopGroup.add("edittext", undefined, "");
         sliderEditField.characters = editTextCharacters;
+        var sliderButton = sliderEditGroup.add("button", undefined, "Slider");
+
+        var angleEditGroup = win.add("panel", undefined,);
+        angleEditGroup.orientation = 'column';
+        angleEditGroup.alignChildren = ["fill", "fill"];
+        var angleTopGroup = angleEditGroup.add("group", undefined, "Angle top");
+        angleTopGroup.orientation = 'row';
+        angleTopGroup.alignChildren = ["fill", "fill"]
+        var angleStaticText = angleTopGroup.add("statictext", undefined, "Enter an angle value:");
+        var angleEditField = angleTopGroup.add("edittext", undefined, "");
+        angleEditField.characters = editTextCharacters;
+        var angleButton = angleEditGroup.add("button", undefined, "Angle");
 
         var colorGroup = win.add("panel", undefined,);
-        colorGroup.orientation = 'row';
+        colorGroup.orientation = 'column';
         colorGroup.alignChildren = ["fill", "fill"];
-        var colorStaticText = colorGroup.add("statictext", undefined, "Enter RGB values: ");
-        var rgbEditField = colorGroup.add("edittext", undefined, "");
-        rgbEditField.characters = editTextCharacters; 
-        var colorHelpButton = colorGroup.add("button", undefined, "?");
-        colorHelpButton.helpTip = 'When entering numbers, make sure to leave a space between numbers';
-        colorHelpButton.size = [10, -1];
+        var colorTopGroup = colorGroup.add("group", undefined, "color top");
+        colorTopGroup.orientation = 'row';
+        colorTopGroup.alignChildren = ["fill", "fill"];
+        var colorStaticText = colorTopGroup.add("statictext", undefined, "Hex values:");
+        var hexEditField = colorTopGroup.add("edittext", undefined, "");
+        hexEditField.characters = editTextCharacters; 
+        var colorButton = colorGroup.add("button", undefined, "Color");
+        
         
 
         var checkboxGroup = win.add("panel", undefined, );
-        checkboxGroup.orientation = 'row';
+        checkboxGroup.orientation = 'column';
         checkboxGroup.alignChildren = ["fill", "fill"];
-        var cbStatic = checkboxGroup.add("statictext", undefined, "Checkbox values:")
-        var cbOnGroup = checkboxGroup.add("group", undefined, "CB On Group");
+        var checkboxTop = checkboxGroup.add("group", undefined, "CB Top"); 
+        checkboxTop.orientation = 'row';
+        checkboxTop.alignChildren = ["fill", "fill"];
+        var cbStatic = checkboxTop.add("statictext", undefined, "Checkbox values:")
+        var cbOnGroup = checkboxTop.add("group", undefined, "CB On Group");
         var cbOn = cbOnGroup.add("statictext", undefined, "On:");
         var cbOnEdit = cbOnGroup.add("edittext", undefined, "100");
         cbOnEdit.characters = 6;
-        var cbOffGroup = checkboxGroup.add("group", undefined, "CB Off Group");
+        var cbOffGroup = checkboxTop.add("group", undefined, "CB Off Group");
         var cbOff = cbOffGroup.add("statictext", undefined, "Off:");
         var cbOffEdit = cbOffGroup.add("edittext", undefined, "0");
         cbOffEdit.characters = 6;
-
-        var buttonGrp = win.add("group", undefined, "button group");
-        buttonGrp.orientation = 'column';
-        buttonGrp.alignChildren = ["fill", "fill"];
-
-        var buttonsTop = buttonGrp.add("group", undefined, "Buttons Top");
-        buttonsTop.orientation = 'row';
-        buttonsTop.alignChildren = ["fill", "fill"];
-        var sliderButton = buttonsTop.add("button", undefined, "Slider");
-        var angleButton = buttonsTop.add("button", undefined, "Angle");
-
-
-        var buttonsBot = buttonGrp.add("group", undefined, "Buttons Top");
-        buttonsBot.orientation = 'row';
-        buttonsBot.alignChildren = ["fill", "fill"];
-        var colorButton = buttonsBot.add("button", undefined, "Color");
-        var checkBoxButton = buttonsBot.add("button", undefined, "Checkbox");
+        var checkBoxButton = checkboxGroup.add("button", undefined, "Checkbox");
+       
 
         function getControlLayer(controlLayer) {
             var numLayers = comp.numLayers;
@@ -136,13 +141,10 @@
                     var newControlsLayer = comp.layers.addShape();
                     newControlsLayer.name = controlLayer;
                     return newControlsLayer
-
                 }
             }
 
         }
-
-        
 
         sliderButton.onClick = function () {
             app.beginUndoGroup("Slider Controller");
@@ -166,7 +168,7 @@
         angleButton.onClick = function () {
             app.beginUndoGroup("Angle Controller");
 
-            if (sliderEditField.text == "") {
+            if (angleEditField.text == "") {
                 alert("Please enter a valid integer");
                 return
             }
@@ -176,7 +178,7 @@
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToAngle(parseInt(sliderEditField.text), controlsLayer.name, controlEffectName.text);
+            connectPropertyToAngle(parseInt(angleEditField.text), controlsLayer.name, controlEffectName.text);
             win.close();
             app.endUndoGroup()
         }
@@ -185,7 +187,7 @@
         colorButton.onClick = function () {
             app.beginUndoGroup("Color Controller");
 
-            if (rgbEditField.text == "") {
+            if (hexEditField.text == "") {
                 alert("Please enter a valid integer");
                 return
             }
@@ -195,14 +197,9 @@
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToColor(rgbEditField.text, controlsLayer.name, controlEffectName.text);
+            connectPropertyToColor(hexEditField.text, controlsLayer.name, controlEffectName.text);
             win.close()
             app.endUndoGroup()
-        }
-
-
-        colorHelpButton.onClick = function () {
-            alert(colorHelpButton.helpTip)
         }
 
 
@@ -227,7 +224,7 @@
         
 
         win.layout.layout();
-        win.onResizing = win.onResize = function () {
+        win.onResizing = function () {
             this.layout.resize();
         };
 
@@ -312,25 +309,37 @@ y = '+ sliderExpression+';\
     }
 
 
+    function hexToRGB(hexValue) {
+        var hexTrim = hexValue.trim();
+        var hexString = hexTrim;
+        var finalHex = hexString.replace(/[#]/g, "");
+        var hexColor = "0x" + finalHex;
+        var r = hexColor >> 16;
+        var g = (hexColor & 0x00ff00) >> 8;
+        var b = hexColor & 0xff;
+        
+        return [r / 255, g / 255, b / 255]
+    } 
+
+
+
     /**
      *
      *
-     * @param {Object} rgbValues string that gets converted ot numbers to build rgb array
+     * @param {string} hexValue string that sets the input hex value as the color control value
      * @param {string} controls a string for the control layer name
      * @param {string} propName a string for property name
      * @returns color value that has selected properties connected to it
      * 
      */
-    function connectPropertyToColor(rgbValues, controls, propName) {
+    function connectPropertyToColor(hexValue, controls, propName) {
         var colorProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Color Control");
         if (propName) {
             colorProp.name = propName
         } else {
             colorProp.name = selectedProps[0].name;
         }
-        var rgbSplit = rgbValues.split(" ");
-        colorProp.property(1).setValue([parseFloat(rgbSplit[0])/ 255, parseFloat(rgbSplit[1])/ 255, parseFloat(rgbSplit[2]) / 255]);
-        
+        colorProp.property(1).setValue(hexToRGB(hexValue));
         
         var props = selectedProps;
         for (var i = 0; i < props.length; i++){
