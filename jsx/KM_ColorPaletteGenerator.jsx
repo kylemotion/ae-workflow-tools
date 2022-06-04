@@ -2,14 +2,14 @@
  * Creates color palette based on submitted hex codes
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.2
- * 6.3.2022
+ * @version 0.2.3
+ * 6.4.2022
  * 
  * 
 */
 
 
-(function colorPaletteGenerator() {
+(function km_colorPaletteGenerator(thisObj) {
 
     var existingComp = app.project.activeItem;
     if (!(existingComp && existingComp instanceof CompItem)) {
@@ -18,38 +18,55 @@
     }
 
 
-    var mainWindow = new Window("window", "Color Palette Generator", undefined);
-    mainWindow.orientation = 'column';
-    mainWindow.alignChildren = ["fill", "fill"];
+    createUI(thisObj)
 
+    function createUI(thisObj) {
 
-    var editGroup = mainWindow.add("group", undefined, "Edit Group");
-    editGroup.orientation = "column";
-    editGroup.alignChildren = ["fill", "fill"];
-    var editTitle = editGroup.add("statictext", undefined, "Enter Color Palette Hex Codes Below:")
-    var editBox = editGroup.add("edittext", [0, 0, 150, 100], "Enter Hex Codes Here", { multiline: true });
+        var scriptName = "km_colorPaletteGenerator"
 
-    var createGroup = mainWindow.add("group", undefined, "Create Group");
-    createGroup.alignChildren = ["fill", "fill"];
-    createGroup.orientation = 'column';
-    var createButton = createGroup.add("button", undefined, "Create Color Palette")
-
-
-    mainWindow.center();
-    mainWindow.show()
-
-
-    createButton.onClick = function () {
-        app.beginUndoGroup("Color Palette Group")
-
-        var squareParams = {
-            'squareSize': 100
-        }
+        var win = thisObj instanceof Panel
+            ? thisObj
+            : new Window("window", scriptName, undefined, {
+                resizeable: true
+            })
         
-        createColorPaletteComp(editBox.text, squareParams)
-        mainWindow.close();
-        app.endUndoGroup()
+        win.orientation = 'column';
+        win.alignChildren = ["fill", "fill"];
+
+        var editGroup = win.add("group", undefined, "Edit Group");
+        editGroup.orientation = "column";
+        editGroup.alignChildren = ["fill", "fill"];
+        var editTitle = editGroup.add("statictext", undefined, "Enter Color Palette Hex Codes Below:")
+        var editBox = editGroup.add("edittext", [0, 0, 150, 100], "Enter Hex Codes Here", { multiline: true });
+
+        var createGroup = win.add("group", undefined, "Create Group");
+        createGroup.alignChildren = ["fill", "fill"];
+        createGroup.orientation = 'column';
+        var createButton = createGroup.add("button", undefined, "Create Color Palette");
+
+
+        createButton.onClick = function () {
+            app.beginUndoGroup("Color Palette Group")
+    
+            var squareParams = {
+                'squareSize': 100
+            }
+            
+            createColorPaletteComp(editBox.text, squareParams)
+            win.close();
+            app.endUndoGroup()
+
+        }
+
+        win.layout.layout();
+            win.onResizing = function () {
+                this.layout.resize()
+        }
+
+        win.show();
     }
+
+
 
     function getPreCompFolderName() {
         var folderName = "02 PreComps";
@@ -76,15 +93,6 @@
 
     }
 
-    // function lineArray(editBox) {
-    //     var lineArray = new Array();
-    //     var lineAmount = editBox.text.split("\n");
-    //     for (var i = 0; i < lineAmount.length; i++) {
-    //         lineArray.push(lineAmount[i])
-    //     }
-    //     return lineArray
-    // }
-
 
     function hexToRGB(editBox) {
         var colorArray = new Array();
@@ -102,7 +110,6 @@
 
         return colorArray
     } 
-
 
 
     function createColorPaletteComp(editBox, squareParams) {
@@ -178,4 +185,4 @@
 
 
     }
-})()
+})(this)
