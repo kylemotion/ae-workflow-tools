@@ -14,37 +14,17 @@
 
     //// global UI variables
     var editTextCharacters = 20;
-
-    var comp = app.project.activeItem;
-
-    if (!(comp && comp instanceof CompItem)) {
-        alert("Open a comp first!")
-        return
-    }
-
-    /**
-     * 
-     * @param {Object} comp active comp or item in project
-     * @returns {number} number of selected properties
-     */
-
-    function getSelectedProperties(comp) {
-
-        var selectedProperties = comp.selectedProperties;
-        return selectedProperties
-    }
-
-
-
-    var selectedProps = getSelectedProperties(comp);
-
-    if (selectedProps == 0) {
-        alert("Select a property first!")
-        return
-    }
     
 
-    createUI(thisObj);
+
+
+    var theWindow = createUI(thisObj);
+    if (theWindow instanceof Window) {
+        theWindow.center();
+        theWindow.show();
+    } else {
+        theWindow.layout.layout(true);
+    }
 
 
     /**
@@ -108,15 +88,13 @@
         colorTopGroup.alignChildren = ["fill", "fill"];
         var colorStaticText = colorTopGroup.add("statictext", undefined, "Hex values:");
         var hexEditField = colorTopGroup.add("edittext", undefined, "");
-        hexEditField.characters = editTextCharacters; 
+        hexEditField.characters = editTextCharacters;
         var colorButton = colorGroup.add("button", undefined, "Color");
-        
-        
-
-        var checkboxGroup = win.add("panel", undefined, );
+    
+        var checkboxGroup = win.add("panel", undefined,);
         checkboxGroup.orientation = 'column';
         checkboxGroup.alignChildren = ["fill", "fill"];
-        var checkboxTop = checkboxGroup.add("group", undefined, "CB Top"); 
+        var checkboxTop = checkboxGroup.add("group", undefined, "CB Top");
         checkboxTop.orientation = 'row';
         checkboxTop.alignChildren = ["fill", "fill"];
         var cbStatic = checkboxTop.add("statictext", undefined, "Checkbox values:")
@@ -129,7 +107,20 @@
         var cbOffEdit = cbOffGroup.add("edittext", undefined, "0");
         cbOffEdit.characters = 6;
         var checkBoxButton = checkboxGroup.add("button", undefined, "Checkbox");
-       
+        var comp = app.project.activeItem;
+
+
+        /**
+         * 
+         * @param {Object} comp active comp or item in project
+         * @returns {number} number of selected properties
+         */
+
+        function getSelectedProperties(comp) {
+
+            var selectedProperties = comp.selectedProperties;
+            return selectedProperties
+        }
 
         function getControlLayer(controlLayer) {
             var numLayers = comp.numLayers;
@@ -149,24 +140,47 @@
         sliderButton.onClick = function () {
             app.beginUndoGroup("Slider Controller");
 
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Open a comp first!")
+                return
+            }
+
+            var selectedProps = getSelectedProperties(comp);
+
+            if (selectedProps == 0) {
+                alert("Select a property first!")
+                return
+            }
+
             if (sliderEditField.text == "") {
                 alert("Please enter a valid integer");
                 return
             }
-
 
             if (controlLayerName.text) {
                 var controlsLayer = getControlLayer(controlLayerName.text);
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToSlider(parseInt(sliderEditField.text), controlsLayer.name, controlEffectName.text) 
+            connectPropertyToSlider(comp, selectedProps, parseInt(sliderEditField.text), controlsLayer.name, controlEffectName.text)
             win.close();
             app.endUndoGroup()
         }
 
         angleButton.onClick = function () {
             app.beginUndoGroup("Angle Controller");
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Open a comp first!")
+                return
+            }
+
+            var selectedProps = getSelectedProperties(comp);
+
+            if (selectedProps == 0) {
+                alert("Select a property first!")
+                return
+            }
 
             if (angleEditField.text == "") {
                 alert("Please enter a valid integer");
@@ -178,7 +192,7 @@
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToAngle(parseInt(angleEditField.text), controlsLayer.name, controlEffectName.text);
+            connectPropertyToAngle(comp, selectedProps, parseInt(angleEditField.text), controlsLayer.name, controlEffectName.text);
             win.close();
             app.endUndoGroup()
         }
@@ -186,6 +200,19 @@
 
         colorButton.onClick = function () {
             app.beginUndoGroup("Color Controller");
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Open a comp first!")
+                return
+            }
+
+            var selectedProps = getSelectedProperties(comp);
+
+            if (selectedProps == 0) {
+                alert("Select a property first!")
+                return
+            }
+
 
             if (hexEditField.text == "") {
                 alert("Please enter a valid integer");
@@ -197,7 +224,7 @@
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToColor(hexEditField.text, controlsLayer.name, controlEffectName.text);
+            connectPropertyToColor(comp, selectedProps, hexEditField.text, controlsLayer.name, controlEffectName.text);
             win.close()
             app.endUndoGroup()
         }
@@ -207,32 +234,48 @@
         checkBoxButton.onClick = function () {
             app.beginUndoGroup("Checkbox");
 
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Open a comp first!")
+                return
+            }
+
+            var selectedProps = getSelectedProperties(comp);
+
+            if (selectedProps == 0) {
+                alert("Select a property first!")
+                return
+            }
+
+
             if (cbOffEdit.text == "" || cbOnEdit.text == "") {
                 alert("Please enter a valid integer");
                 return
             }
-            
+
             if (controlLayerName.text) {
                 var controlsLayer = getControlLayer(controlLayerName.text);
             } else {
                 controlsLayer = getControlLayer("Controls")
             }
-            connectPropertyToCheckbox(parseInt(cbOffEdit.text), parseInt(cbOnEdit.text), controlsLayer.name, controlEffectName.text);
+            connectPropertyToCheckbox(comp, selectedProps, parseInt(cbOffEdit.text), parseInt(cbOnEdit.text), controlsLayer.name, controlEffectName.text);
             win.close();
             app.endUndoGroup()
         }
-        
 
-        win.layout.layout();
+        // win.layout.layout(true);
+        // win.onResizing = win.onResize = function () { win.layout.resize(); }
+        // win.onShow = function () { win.minimumSize = win.size }
+        // return win;
+
+        win.layout.layout(true);
         win.onResizing = function () {
-            this.layout.resize();
+            win.layout.resize();
         };
+        win.show()
+        return win
 
-        win.show();
-        
     }
-
-
+    
     /**
      *
      *
@@ -242,17 +285,17 @@
      * @returns slider value that has selected properties connected to it
      * 
      */
-    function connectPropertyToSlider(sliderVal, controls, propName) {
-        var sliderProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+    function connectPropertyToSlider(currentComp, properties,sliderVal, controls, propName) {
+        var sliderProp = currentComp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Slider Control");
         if (propName) {
             sliderProp.name = propName
         } else {
-            sliderProp.name = selectedProps[0].name;
+            sliderProp.name = properties[0].name;
         }
         sliderProp.property(1).setValue(sliderVal);
         var sliderExpression = 'thisComp.layer("'+controls+'").effect("'+sliderProp.name+'")(1).value';
 
-        var props = selectedProps;
+        var props = properties;
         for (var i = 0; i < props.length; i++) {
 
                 if (props[i].propertyValueType == 6413 || props[i].propertyValueType == 6414) {
@@ -291,16 +334,16 @@ y = '+ sliderExpression+';\
      * @returns angle value that has selected properties connected to it
      * 
      */
-    function connectPropertyToAngle(angleVal, controls, propName) {
-        var angleProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Angle Control");
+    function connectPropertyToAngle(currentComp, properties, angleVal, controls, propName) {
+        var angleProp = currentComp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Angle Control");
         if (propName) {
             angleProp.name = propName
         } else {
-            angleProp.name = selectedProps[0].name;
+            angleProp.name = properties[0].name;
         }
         angleProp.property(1).setValue(angleVal);
 
-        var props = selectedProps;
+        var props = properties;
         for (var i = 0; i < props.length; i++){
                 props[i].expression =
                     'thisComp.layer("'+controls+'").effect("'+angleProp.name+'")(1).value'
@@ -332,16 +375,16 @@ y = '+ sliderExpression+';\
      * @returns color value that has selected properties connected to it
      * 
      */
-    function connectPropertyToColor(hexValue, controls, propName) {
-        var colorProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Color Control");
+    function connectPropertyToColor(currentComp, properties ,hexValue, controls, propName) {
+        var colorProp = currentComp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Color Control");
         if (propName) {
             colorProp.name = propName
         } else {
-            colorProp.name = selectedProps[0].name;
+            colorProp.name = properties[0].name;
         }
         colorProp.property(1).setValue(hexToRGB(hexValue));
         
-        var props = selectedProps;
+        var props = properties;
         for (var i = 0; i < props.length; i++){
                 props[i].expression =
                     'thisComp.layer("'+controls+'").effect("'+colorProp.name+'")(1).value'
@@ -360,16 +403,16 @@ y = '+ sliderExpression+';\
      * 
      * 
      */
-    function connectPropertyToCheckbox(minVal, maxVal, controls, propName) {
-        var checkboxProp = comp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+    function connectPropertyToCheckbox(currentComp, properties, minVal, maxVal, controls, propName) {
+        var checkboxProp = currentComp.layer(controls).property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
         if (propName) {
             checkboxProp.name = propName
         } else {
-            checkboxProp.name = selectedProps[0].name;
+            checkboxProp.name = properties[0].name;
         }
         checkboxProp.property(1).setValue(true);
 
-        var props = selectedProps;
+        var props = properties;
         for (var i = 0; i < props.length; i++) {
             props[i].expression =
                 'var checkBoxCtrl = thisComp.layer("'+controls+'").effect("'+checkboxProp.name+'")(1).value\
