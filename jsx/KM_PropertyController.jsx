@@ -14,17 +14,8 @@
 
     //// global UI variables
     var editTextCharacters = 20;
-    
 
-
-
-    var theWindow = createUI(thisObj);
-    if (theWindow instanceof Window) {
-        theWindow.center();
-        theWindow.show();
-    } else {
-        theWindow.layout.layout(true);
-    }
+    createUI(thisObj);
 
 
     /**
@@ -266,13 +257,20 @@
         // win.onResizing = win.onResize = function () { win.layout.resize(); }
         // win.onShow = function () { win.minimumSize = win.size }
         // return win;
-
-        win.layout.layout(true);
-        win.onResizing = function () {
-            win.layout.resize();
+        
+        win.onResizing = win.onResize = function () {
+            this.layout.resize();
         };
-        win.show()
-        return win
+
+        if (win instanceof Window) {
+            win.center();
+            win.show();
+        } else {
+
+            win.layout.layout(true);
+            win.layout.resize();
+        }
+        
 
     }
     
