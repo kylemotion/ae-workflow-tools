@@ -12,56 +12,7 @@
 (function km_renderHelper(thisObj) {
 
 
-    var activeSelection = app.project.selection;
-    if (!activeSelection) {
-        alert("Select one or more comps in your project panel first");
-        return
-    }
-
-    function getActiveSelection() {
-        var compNameArray = new Array();
-
-        for (var i = 0; i < activeSelection.length; i++) {
-            if (activeSelection[i] instanceof CompItem) {
-                compNameArray.push(activeSelection[i])
-            }
-        }
-        return compNameArray
-    }
-
-    var compSelection = getActiveSelection();
-
-    var activeComp = app.project.activeItem;
-
-    function addToRenderQueue(compsSelected) {
-        var renderQueue = app.project.renderQueue;
-        while (renderQueue.numItems > 0) {
-            renderQueue.item(1).remove();
-        }
-
-        if (compsSelected.length > 1) {
-            for (var i = 0; i < compsSelected.length; i++) {
-                if (compsSelected[i] instanceof CompItem) {
-                    renderQueue.items.add(compsSelected[i]);
-                }
-            }
-        } else if (activeComp && activeComp instanceof CompItem) {
-            renderQueue.items.add(activeComp)
-        }
-
-        return renderQueue
-
-    }
-
-    app.beginUndoGroup("remove and add items from Render queue");
-
-    addToRenderQueue(compSelection)
-
-    app.endUndoGroup();
-
-
-
-    var renderQueue = app.project.renderQueue;
+   
 
 
     createUI(thisObj)
@@ -80,7 +31,7 @@
             })
 
         win.orientation = 'column';
-        win.alignChildren = ["fill", "fill"];
+        win.alignChildren = ["fill", "top"];
 
 
         var headerGroup = win.add("group", undefined, "headerGroup")
@@ -89,10 +40,14 @@
         var logoButton = headerGroup.add("image", undefined, gmLogo);
 
 
+        var addRenderQuePanel = win.add("panel", undefined, "Add to Render Que");
+        addRenderQuePanel.alignChildren = ["fill", "top"];
+        var addRQButton = addRenderQuePanel.add("button", undefined, "Add to Render Que");
+
         // ----- A panel  for setting the save location of your render ------
         var saveLocationPanel = win.add("panel", undefined, "Output Location");
         saveLocationPanel.orientation = 'row';
-        saveLocationPanel.alignChildren = ["fill", "fill"];
+        saveLocationPanel.alignChildren = ["fill", "top"];
         var saveLocationChange = saveLocationPanel.add("statictext", undefined, 'Click Button To Update');
         saveLocationChange.preferredSize = [panelWidth, textFieldHeight];
         if ($.os.indexOf("Windows") != -1) {
@@ -100,8 +55,6 @@
         } else {
             var folderPath = "~/Desktop";
         }
-
-
 
         saveLocationChange.text = folderPath;
 
@@ -114,7 +67,7 @@
 
         var renderSettingsButtonPanel = win.add("panel", undefined, "Output Module");
         renderSettingsButtonPanel.orientation = "column";
-        renderSettingsButtonPanel.alignChildren = ["fill", "fill"]
+        renderSettingsButtonPanel.alignChildren = ["fill", "top"]
         var renderAppGroup = renderSettingsButtonPanel.add("group", undefined, "render app");
         renderAppGroup.orientation = "row";
         var renderInAEButton = renderAppGroup.add('radiobutton', undefined, "Render in AE");
@@ -129,7 +82,7 @@
 
         var saveNamePanel = win.add("panel", undefined, "Output Name");
         saveNamePanel.orientation = 'column';
-        saveNamePanel.alignChildren = ["fill", "fill"]
+        saveNamePanel.alignChildren = ["fill", "top"]
         var renderNameGroup = saveNamePanel.add("group", undefined, "Render Name Options");
         renderNameGroup.orientation = "column";
         renderNameGroup.alignChildren = "left";
@@ -138,24 +91,15 @@
         compNameButton.value = true;
         var customNameButton = renderNameButtonGroup.add("RadioButton", undefined, "Custom Name");
         var renderNameEdit = saveNamePanel.add("EditText", [0, 0, panelWidth, textFieldHeight], "");
-        renderNameEdit.text = renderQueue.item(1).comp.name;
         renderNameEdit.characters = 25;
         var renderNameChange = saveNamePanel.add("StaticText", undefined, '');
-
-        compNameButton.onClick = function () {
-            renderNameEdit.text = renderQueue.item(1).comp.name;
-        }
-        customNameButton.onClick = function () {
-            renderNameEdit.text = "Enter a custom render file name"
-        }
-
         renderNameChange.characters = renderNameEdit.characters;
         renderNameChange.text = renderNameEdit.text;
-        renderNameEdit.onChanging = function () { renderNameChange.text = renderNameEdit.text };
+        
 
         var renderGroup = win.add("panel", undefined, "Render Me");
         renderGroup.orientation = 'row';
-        renderGroup.alignChildren = ["fill", "fill"];
+        renderGroup.alignChildren = ["fill", "top"];
         var renderButton = renderGroup.add("button", undefined, "Render");
 
 
@@ -178,22 +122,77 @@
 
 
         helpButton.onClick = function () {
-            alert("How to use:\nSet your destination folder.\nSelect your Output Module.\nEnter your clip name.\nClick Render.")
+            alert("How to use:\nSelect comps\nClick Add to Render Que Button\nSet your destination folder.\nSelect your Output Module.\nEnter your clip name.\nClick Render.")
         }
 
 
+        var activeSelection = app.project.selection;
+    
+
+        function getActiveSelection() {
+            var compNameArray = new Array();
+
+            for (var i = 0; i < activeSelection.length; i++) {
+                if (activeSelection[i] instanceof CompItem) {
+                    compNameArray.push(activeSelection[i])
+                }
+            }
+            return compNameArray
+        }
+
+        var compSelection = getActiveSelection();
+
+        var activeComp = app.project.activeItem;
+        
+        var renderQueue = app.project.renderQueue;
+
+        function addToRenderQueue(compsSelected) {
+            while (renderQueue.numItems > 0) {
+                renderQueue.item(1).remove();
+            }
+
+            if (compsSelected.length > 1) {
+                for (var i = 0; i < compsSelected.length; i++) {
+                    if (compsSelected[i] instanceof CompItem) {
+                        renderQueue.items.add(compsSelected[i]);
+                    }
+                }
+            } else if (activeComp && activeComp instanceof CompItem) {
+                renderQueue.items.add(activeComp)
+            }
+
+            return renderQueue
+
+        }
+
+
+
+        addRQButton.onClick = function () {
+            app.beginUndoGroup("Add To Render Que");
+
+            if (!activeSelection) {
+                alert("Select one or more comps in your project panel first");
+                return
+            }
+
+            addToRenderQueue(compSelection);
+
+            app.endUndoGroup();
+        }
+
+        
+
         function renderOutputModules() {
             var outputModuleTemplates = [];
-            var renderQueue = app.project.renderQueue;
             var outputModules = renderQueue.item(1).outputModule(1).templates;
             for (var i = 0; i < outputModules.length; i++) {
                 outputModuleTemplates.push(outputModules[i])
             }
             return outputModuleTemplates
         }
-
+        
         var renderModules = renderOutputModules();
-
+        
         function populateOutputModules(renderSettingsList) {
             renderSettingsList.removeAll();
 
@@ -206,7 +205,17 @@
             return renderSettingsList
         }
 
+  
 
+        renderNameEdit.text = renderQueue.item(1).comp.name;
+
+        compNameButton.onClick = function () {
+            renderNameEdit.text = renderQueue.item(1).comp.name;
+        }
+        customNameButton.onClick = function () {
+            renderNameEdit.text = "Enter a custom render file name"
+        }
+        renderNameEdit.onChanging = function () { renderNameChange.text = renderNameEdit.text };
 
 
         if (renderInAEButton.value == true) {
@@ -245,12 +254,17 @@
 
         }
 
-        win.layout.layout();
-        win.onResizing = function () {
+        win.onResizing = win.onResize = function () {
             this.layout.resize();
         };
 
-        win.show();
+        if (win instanceof Window) {
+            win.center();
+            win.show();
+        } else {
+            win.layout.layout(true);
+            win.layout.resize();
+        }
 
 
     }
@@ -271,6 +285,7 @@
 
 
         for (var b = 1; b <= renderQueue.numItems; b++) {
+            var renderQueue = app.project.renderQueue;
             var outputFolder = saveLocation;
             if (compNameOutput == true) {
                 var outputName = renderQueue.item(b).comp.name;
