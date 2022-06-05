@@ -7,32 +7,13 @@
  * 
  * @title Set Matte Applier
  * @author Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.2
- * 5.27.2022
+ * @version 0.3.1
+ * 6.5.2022
  * 
  * 
 */
 
 (function km_setMatteApplier(thisObj) {
-    
-    
-    var existingComp = app.project.activeItem;
-
-    if (!(existingComp && existingComp instanceof CompItem)) {
-        alert("Open a comp first!")
-        return
-    } 
-
-
-    if (existingComp.selectedLayers == 0) {
-        alert("Select atleast one layer to apply the Set Matte effect to")
-        return
-    }
-
-
-    var globalLayers = [];
-    var globalLayerNames = [];
-    
 
     createUI(thisObj);
 
@@ -50,11 +31,11 @@
             })
         
         win.orientation = "column";
-        win.alignChildren = ["fill", "fill"];
+        win.alignChildren = ["fill", "top"];
 
         var setMatteSettingsPanel = win.add("panel", undefined, "Set Matte Settings");
         setMatteSettingsPanel.orientation = "column";
-        setMatteSettingsPanel.alignChildren = ["left", "fill"]
+        setMatteSettingsPanel.alignChildren = ["fill", "top"]
         setMatteSettingsPanel.margins = 15;
             var matteLayerStatic = setMatteSettingsPanel.add("statictext", undefined, "Select Matte Layer:");
             
@@ -70,22 +51,15 @@
 
         var applyGroup = win.add("group", undefined, "Push Me");
             applyGroup.orientation = 'row';
-            applyGroup.alignChildren = "fill";
+            applyGroup.alignChildren = ["fill","top"];
         var helpButton = applyGroup.add("button", undefined, "Help Me");
         helpButton.helpTip = "How to use:\n1. Select layer that will serve as matte in the dropdown\n\n2. Check Invert Matte for Invert Matte\n\n3. Click Matte Visible to change matte visibility\n\n4. Click apply!";
         var applyButton = applyGroup.add("button", undefined, "Apply Matte");
 
 
-        win.layout.layout();
-        win.onResizing = function () {
-            this.layout.resize();
-        };
-
-        
+        var existingComp = app.project.activeItem;
 
         var layerList = init(mainButtonDD);
-
-
 
         helpButton.onClick = function(){
             alert(helpButton.helpTip)
@@ -93,15 +67,38 @@
 
         applyButton.onClick = function () {
 
+            if (!(existingComp && existingComp instanceof CompItem)) {
+                alert("Open a comp first!")
+                return
+            }
+
+
+            if (existingComp.selectedLayers == 0) {
+                alert("Select atleast one layer to apply the Set Matte effect to")
+                return
+            }
+
+
+
             app.beginUndoGroup("apply set matte");
             
-        applySetMatte(mainButtonDD, invertMatte.value, matteVisibility.value);
+            applySetMatte(existingComp, mainButtonDD, invertMatte.value, matteVisibility.value);
             win.close();
 
         app.endUndoGroup();
-}
+        }
 
-        win.show()
+        win.onResizing = win.onResize = function () {
+            this.layout.resize();
+        };
+
+        if (win instanceof Window) {
+            win.center();
+            win.show();
+        } else {
+            win.layout.layout(true);
+            win.layout.resize();
+        }
     }
 
 /**
@@ -111,8 +108,8 @@
  */
 
     function init(dropDown){
-    globalLayers = [];
-    globalLayerNames = [];
+    var globalLayers = [];
+    var globalLayerNames = [];
     dropDown.removeAll();
     
     var existingComp = app.project.activeItem;
@@ -141,8 +138,8 @@
      * @returns apply set matte process
      */
     
-    function applySetMatte(dropDown, invertMatte, matteViz) {
-    var comp = existingComp;
+    function applySetMatte(currentComp, dropDown, invertMatte, matteViz) {
+        var comp = currentComp;
     var layersSelected = comp.selectedLayers;
         for (var i = 0; i < layersSelected.length; i++) {
             var ddSel = parseFloat(dropDown.selection) + 1;
