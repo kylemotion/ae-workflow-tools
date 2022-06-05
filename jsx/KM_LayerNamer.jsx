@@ -10,19 +10,7 @@
 
 (function km_layerRenamer(thisObj) {
 
-    var activeComp = app.project.activeItem;
-
-    if (!(activeComp && activeComp instanceof CompItem)) {
-        alert("Please open up a comp first!")
-        return
-    }
-
-    var selectedLayers = activeComp.selectedLayers;
-
-    if (selectedLayers<1) {
-        alert("Please select atleast 1 layer first!")
-        return
-    }
+   
 
 
 
@@ -37,11 +25,11 @@
             })
 
         win.orientation = "column";
-        win.alignChildren = ["fill", "fill"];
+        win.alignChildren = ["fill", "top"];
 
         var layerNameSepPanel = win.add("panel", undefined);
         layerNameSepPanel.orientation = "row";
-        layerNameSepPanel.alignChildren = ["fill", "fill"];
+        layerNameSepPanel.alignChildren = ["fill", "top"];
         var layerNameEditGroup = layerNameSepPanel.add("group", undefined, "Layer Name Group");
         layerNameEditGroup.orientation = "column";
         layerNameEditGroup.alignChildren = "left";
@@ -65,7 +53,7 @@
 
         var buttonGroup = win.add("group", undefined, "buttons");
         buttonGroup.orientation = 'row';
-        buttonGroup.alignChildren = ["fill", "fill"];
+        buttonGroup.alignChildren = ["fill", "top"];
         // var replaceButton = buttonGroup.add("button", undefined, "Replace");
         // replaceButton.size = [100, 25]
         var renameButton = buttonGroup.add("button", undefined, "Rename");
@@ -78,25 +66,44 @@
         //     app.endUndoGroup()
         // }
 
+        var activeComp = app.project.activeItem;
+
         renameButton.onClick = function () {
             app.beginUndoGroup("rename")
-            renameLayers(layerNameEdit.text, separatorEdit.text);
+
+            if (!(activeComp && activeComp instanceof CompItem)) {
+                alert("Please open up a comp first!")
+                return
+            }
+            var selectedLayers = activeComp.selectedLayers;
+
+            if (selectedLayers < 1) {
+                alert("Please select atleast 1 layer first!")
+                return
+            }
+
+            renameLayers(selectedLayers,layerNameEdit.text, separatorEdit.text);
             win.close();
             app.endUndoGroup()
         }
 
 
-        win.layout.layout();
         win.onResizing = win.onResize = function () {
             this.layout.resize();
         };
 
-        win.show()
+        if (win instanceof Window) {
+            win.center();
+            win.show();
+        } else {
+            win.layout.layout(true);
+            win.layout.resize();
+        }
     }
 
 
 
-    function renameLayers(layerNames, separator) {
+    function renameLayers(selectedLayers,layerNames, separator) {
         for (var i = 0; i < selectedLayers.length; i++) {
             var count = i + 1;
             selectedLayers[i].name = layerNames + separator + count
