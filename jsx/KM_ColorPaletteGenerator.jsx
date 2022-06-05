@@ -46,9 +46,6 @@
         createButton.onClick = function () {
             app.beginUndoGroup("Color Palette Group")
 
-            if (comp) {
-                alert("true")
-            }
     
             if (!(comp && comp instanceof CompItem)) {
                 alert("Please open a comp first!");
