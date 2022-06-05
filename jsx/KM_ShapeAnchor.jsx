@@ -5,8 +5,8 @@
  * 
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.0
- * 5.27.2022
+ * @version 0.3.0
+ * 6.5.2022
  * 
  * 
 */
