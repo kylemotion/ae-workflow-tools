@@ -11,59 +11,77 @@
 
 (function km_colorPaletteGenerator(thisObj) {
 
-    var existingComp = app.project.activeItem;
-    if (!(existingComp && existingComp instanceof CompItem)) {
-        alert("Please open a comp first!");
-        return
-    }
+
+    var scriptName = "km_colorPaletteGenerator";
 
 
-    createUI(thisObj)
+    createUI(thisObj);
 
+    /**
+     * 
+     * @param {Object} thisObj
+     * 
+     *  
+     */
     function createUI(thisObj) {
-
-        var scriptName = "km_colorPaletteGenerator"
-
         var win = thisObj instanceof Panel
             ? thisObj
-            : new Window("window", scriptName, undefined, {
+            : new Window("palette", scriptName, undefined, {
                 resizeable: true
-            })
+            });
         
         win.orientation = 'column';
         win.alignChildren = ["fill", "fill"];
 
-        var editGroup = win.add("group", undefined, "Edit Group");
-        editGroup.orientation = "column";
-        editGroup.alignChildren = ["fill", "fill"];
-        var editTitle = editGroup.add("statictext", undefined, "Enter Color Palette Hex Codes Below:")
-        var editBox = editGroup.add("edittext", [0, 0, 150, 100], "Enter Hex Codes Here", { multiline: true });
+        var panelGroup = win.add("group", undefined, "Edit Group");
+        panelGroup.orientation = "column";
+        panelGroup.alignChildren = ["fill", "top"];
+        var editTitle = panelGroup.add("statictext", undefined, "Enter Color Palette Hex Codes Below:")
+        var editBox = panelGroup.add("edittext", [0, 0, 150, 100], "Enter Hex Codes Here", { multiline: true });
+        var createButton = panelGroup.add("button", undefined, "Create Color Palette");
 
-        var createGroup = win.add("group", undefined, "Create Group");
-        createGroup.alignChildren = ["fill", "fill"];
-        createGroup.orientation = 'column';
-        var createButton = createGroup.add("button", undefined, "Create Color Palette");
+        var comp = app.project.activeItem;
 
 
         createButton.onClick = function () {
             app.beginUndoGroup("Color Palette Group")
+
+            if (comp) {
+                alert("true")
+            }
     
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Please open a comp first!");
+                return
+            }
+
+            if (editBox.text == "") {
+                alert("Enter atleast 1 hex code first!")
+                return 
+            }
+
             var squareParams = {
                 'squareSize': 100
             }
             
-            createColorPaletteComp(editBox.text, squareParams)
+            createColorPaletteComp(comp,editBox.text, squareParams)
             win.close();
             app.endUndoGroup()
 
         }
 
-        win.layout.layout();
-            win.onResizing = function () {
-                this.layout.resize()
-        }
+        win.onResizing = win.onResize = function () {
+            this.layout.resize();
+        };
 
-        win.show();
+        if (win instanceof Window) {
+            win.center();
+            win.show();
+        } else {
+
+            win.layout.layout(true);
+            win.layout.resize();
+        }
     }
 
 
@@ -112,8 +130,8 @@
     } 
 
 
-    function createColorPaletteComp(editBox, squareParams) {
-        var comp = existingComp;
+    function createColorPaletteComp(currentComp,editBox, squareParams) {
+        var comp = currentComp;
         var colorArray = hexToRGB(editBox);
         var colorPalComp = app.project.items.addComp("Color Palette", (colorArray.length * squareParams.squareSize), squareParams.squareSize, 1.0, comp.duration, 24);
         var colorPalFolder = app.project.items.addFolder("Color Palette Comp");
