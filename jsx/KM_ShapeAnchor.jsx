@@ -13,19 +13,6 @@
 
 (function km_shapeAnchor(thisObj){
 
-    var comp = app.project.activeItem;
-   
-        
-    if (!(comp && comp instanceof CompItem)) {
-        alert("Select or open a comp first!")
-            return 
-        }
-    
-    if (comp.selectedLayers < 1) {
-        alert("Select the Position property in your shape group first");
-        return
-    }
-
     createUI(thisObj);
 
 
@@ -38,7 +25,7 @@
 
         
         win.orientation = 'column';
-        win.alignChildren = ["fill", "fill"];
+        win.alignChildren = ["fill", "top"];
         
         var mainWindow = win.add("group", undefined, "main window")
         mainWindow.orientation = "column";
@@ -94,65 +81,187 @@
         howWorkButton.preferredSize = [100, 25];
         howWorkButton.helpTip = "Select the position properties inside of the shape groups that you wish to apply the position to. Click your desired button to apply the expression to.";
 
+
+        var comp = app.project.activeItem;
+
+        /**
+            *
+            *
+            * @return array of selected properties 
+            */
+
+        function compSelectedProperties(currentComp) {
+            var propArray = new Array();
+            var compProps = currentComp.selectedProperties;
+            for (var m = 0; m < compProps.length; m++) {
+                propArray.push(compProps[m]);
+            }
+
+            return propArray;
+        }
+
+        var propArray = compSelectedProperties(comp);
+ 
+
+
         topLeftButton.onClick = function () {
             app.beginUndoGroup("Top Left");
-            topLeftPos();
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+            topLeftPos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         topMiddleButton.onClick = function () {
             app.beginUndoGroup("Top Middle");
-            topMiddlePos();
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+
+            topMiddlePos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         topRightButton.onClick = function () {
             app.beginUndoGroup("Top Right");
-            topRightPos();
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+            topRightPos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         midLeftButton.onClick = function () {
             app.beginUndoGroup("Mid Left");
-            midLeftPos();
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+
+            midLeftPos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         middleButton.onClick = function () {
             app.beginUndoGroup("Mid");
-            midPos();
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+            midPos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         midRightButton.onClick = function () {
             app.beginUndoGroup("Mid Right");
-            midRightPos();
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+            midRightPos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         botLeftButton.onClick = function () {
             app.beginUndoGroup("Top Right");
-            botLeftPos();
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+            botLeftPos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         botMiddleButton.onClick = function () {
             app.beginUndoGroup("Bot Mid");
-            botMidPos();
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+            botMidPos(propArray);
             win.close();
             app.endUndoGroup()
         }
 
         botRightButton.onClick = function () {
             app.beginUndoGroup("Bot Right");
-            botRightPos();
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+            botRightPos(propArray);
             win.close();
             app.endUndoGroup()
         }
@@ -167,41 +276,28 @@
 
         roundnessButton.onClick = function () {
             app.beginUndoGroup("roundness");
-            roundnessExpression();
+            roundnessExpression(propArray);
             win.close();
             app.endUndoGroup()
         }
             
 
-        win.layout.layout();
-        win.onResizing = function () {
-            this.layout.resize()
-        }
+        win.onResizing = win.onResize = function () {
+            this.layout.resize();
+        };
 
-        win.show()
+        if (win instanceof Window) {
+            win.center();
+            win.show();
+        } else {
+            win.layout.layout(true);
+            win.layout.resize();
+        }
 
 
     }
             
 
-
-        /**
-         *
-         *
-         * @return array of selected properties 
-         */
-    
-        function compSelectedProperties(){
-            var propArray = new Array();
-            var compProps = comp.selectedProperties;
-            for(var m = 0; m < compProps.length; m++){
-                propArray.push(compProps[m]);
-            }
-
-            return propArray;
-        }
-
-    var propArray = compSelectedProperties();
     
     
         /**
@@ -209,8 +305,8 @@
          * @returns top left position expression
          */
     
-        function topLeftPos(){
-            var props = propArray;    
+    function topLeftPos(selectedProps){
+        var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -226,8 +322,8 @@
          * @returns top mid position expression
          */
     
-        function topMiddlePos(){
-            var props = propArray;    
+    function topMiddlePos(selectedProps){
+            var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -243,8 +339,8 @@
          * @returns top right position expression
          */
     
-        function topRightPos(){
-            var props = propArray;    
+    function topRightPos(selectedProps){
+            var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -260,8 +356,8 @@
          * @returns mid left position expression
          */
     
-        function midLeftPos(){
-            var props = propArray;    
+    function midLeftPos(selectedProps){
+        var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -277,8 +373,8 @@
          * @returns middle position expression
          */
     
-        function midPos(){
-            var props = propArray;    
+    function midPos(selectedProps){
+            var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'x = 0;\
@@ -293,8 +389,8 @@
          * @returns mid right position expression
          */
     
-        function midRightPos(){
-            var props = propArray;    
+    function midRightPos(selectedProps){
+        var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -310,8 +406,8 @@
          * @returns bot left position expression
          */
     
-        function botLeftPos(){
-            var props = propArray;    
+    function botLeftPos(selectedProps){
+        var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -327,8 +423,8 @@
          * @returns bot mid position expression
          */
     
-        function botMidPos(){
-            var props = propArray;    
+    function botMidPos(selectedProps){
+        var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -344,8 +440,8 @@
          * @returns bot right position expression
          */
     
-        function botRightPos(){
-            var props = propArray;    
+    function botRightPos(selectedProps){
+        var props = selectedProps;    
             for(var i = 0; i<props.length; i++){
                 props[i].expression = 
         'var shapeGroup = thisProperty.propertyGroup(1);\
@@ -363,8 +459,8 @@
          */
     
 
-        function roundnessExpression() {
-            var props = propArray;
+    function roundnessExpression(selectedProps) {
+            var props = selectedProps;
             for (var i = 0; i < props.length; i++) {
                 props[i].expression =
         'shapeRoundness = value;\
