@@ -16,8 +16,6 @@
     var editTextCharacters = 20;
 
     createUI(thisObj);
-
-
     /**
      * 
      * @param {Object} thisObj
