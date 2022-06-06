@@ -57,7 +57,7 @@
         var applyButton = applyGroup.add("button", undefined, "Apply Matte");
 
 
-        var existingComp = app.project.activeItem;
+        
 
         var layerList = init(mainButtonDD);
 
@@ -66,21 +66,15 @@
         }
 
         applyButton.onClick = function () {
+            app.beginUndoGroup("apply set matte");
 
-            if (!(existingComp && existingComp instanceof CompItem)) {
-                alert("Open a comp first!")
-                return
-            }
-
+            var existingComp = app.project.activeItem;
 
             if (existingComp.selectedLayers == 0) {
                 alert("Select atleast one layer to apply the Set Matte effect to")
                 return
             }
 
-
-
-            app.beginUndoGroup("apply set matte");
             
             applySetMatte(existingComp, mainButtonDD, invertMatte.value, matteVisibility.value);
             win.close();
