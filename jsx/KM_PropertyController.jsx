@@ -4,8 +4,8 @@
  * 
  * @title KM_PropertyController
  * @author Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.2
- * 6.4.2022
+ * @version 0.2.3
+ * 6.5.2022
  * 
  * 
 */
@@ -96,7 +96,6 @@
         var cbOffEdit = cbOffGroup.add("edittext", undefined, "0");
         cbOffEdit.characters = 6;
         var checkBoxButton = checkboxGroup.add("button", undefined, "Checkbox");
-        var comp = app.project.activeItem;
 
 
         /**
@@ -105,15 +104,15 @@
          * @returns {number} number of selected properties
          */
 
-        function getSelectedProperties(comp) {
-
+        function getSelectedProperties() {
+            var comp = app.project.activeItem;
             var selectedProperties = comp.selectedProperties;
             return selectedProperties
         }
 
         function getControlLayer(controlLayer) {
+            var comp = app.project.activeItem;
             var numLayers = comp.numLayers;
-
             for (var i = 1; i <= numLayers; i++) {
                 if (comp.layer(i).name === controlLayer) {
                     return comp.layer(i)
@@ -129,12 +128,14 @@
         sliderButton.onClick = function () {
             app.beginUndoGroup("Slider Controller");
 
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Open a comp first!")
                 return
             }
 
-            var selectedProps = getSelectedProperties(comp);
+            var selectedProps = getSelectedProperties();
 
             if (selectedProps == 0) {
                 alert("Select a property first!")
@@ -159,12 +160,14 @@
         angleButton.onClick = function () {
             app.beginUndoGroup("Angle Controller");
 
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Open a comp first!")
                 return
             }
 
-            var selectedProps = getSelectedProperties(comp);
+            var selectedProps = getSelectedProperties();
 
             if (selectedProps == 0) {
                 alert("Select a property first!")
@@ -190,12 +193,15 @@
         colorButton.onClick = function () {
             app.beginUndoGroup("Color Controller");
 
+            var comp = app.project.activeItem;
+
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Open a comp first!")
                 return
             }
 
-            var selectedProps = getSelectedProperties(comp);
+            var selectedProps = getSelectedProperties();
 
             if (selectedProps == 0) {
                 alert("Select a property first!")
@@ -223,12 +229,14 @@
         checkBoxButton.onClick = function () {
             app.beginUndoGroup("Checkbox");
 
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Open a comp first!")
                 return
             }
 
-            var selectedProps = getSelectedProperties(comp);
+            var selectedProps = getSelectedProperties();
 
             if (selectedProps == 0) {
                 alert("Select a property first!")
@@ -251,10 +259,6 @@
             app.endUndoGroup()
         }
 
-        // win.layout.layout(true);
-        // win.onResizing = win.onResize = function () { win.layout.resize(); }
-        // win.onShow = function () { win.minimumSize = win.size }
-        // return win;
         
         win.onResizing = win.onResize = function () {
             this.layout.resize();
