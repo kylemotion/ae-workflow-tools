@@ -40,12 +40,13 @@
         var editBox = panelGroup.add("edittext", [0, 0, 150, 100], "Enter Hex Codes Here", { multiline: true });
         var createButton = panelGroup.add("button", undefined, "Create Color Palette");
 
-        var comp = app.project.activeItem;
+        
 
 
         createButton.onClick = function () {
-            app.beginUndoGroup("Color Palette Group")
+            app.beginUndoGroup("Color Palette Group");
 
+            var comp = app.project.activeItem;
     
             if (!(comp && comp instanceof CompItem)) {
                 alert("Please open a comp first!");
