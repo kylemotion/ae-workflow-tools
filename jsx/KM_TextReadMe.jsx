@@ -53,12 +53,10 @@
         var createTextButton = createTextGroup.add("Button", undefined, "Create Read Me Text");
         createTextButton.preferredSize = [-1, 30];
 
-        var activeComp = app.project.activeItem;
-
-
-
-
+        
         createTextButton.onClick = function () {
+            
+            var activeComp = app.project.activeItem;
             app.beginUndoGroup("Helper Text");
 
             if (!(activeComp && activeComp instanceof CompItem)) {
