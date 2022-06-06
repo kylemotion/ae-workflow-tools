@@ -11,12 +11,7 @@
 
 (function km_readMeTextLayer(thisObj) {
 
-    var activeComp = app.project.activeItem;
 
-    if (!(activeComp && activeComp instanceof CompItem)) {
-        alert("Please open up a comp first!")
-        return
-    }
 
 
     createUI(thisObj)
@@ -58,31 +53,42 @@
         var createTextButton = createTextGroup.add("Button", undefined, "Create Read Me Text");
         createTextButton.preferredSize = [-1, 30];
 
-        
+        var activeComp = app.project.activeItem;
+
+
 
 
         createTextButton.onClick = function () {
             app.beginUndoGroup("Helper Text");
 
+            if (!(activeComp && activeComp instanceof CompItem)) {
+                alert("Please open up a comp first!")
+                return
+            }
+
+            helperTextLayer(activeComp ,editTextField.text, charAmtEdit.text)
             win.close();
-            helperTextLayer(editTextField.text, charAmtEdit.text)
 
             app.endUndoGroup()
         };
         
         
         
-        win.layout.layout();
         win.onResizing = win.onResize = function () {
             this.layout.resize();
         };
 
-        win.show();
-
+        if (win instanceof Window) {
+            win.center();
+            win.show();
+        } else {
+            win.layout.layout(true);
+            win.layout.resize();
+        }
     }
 
-    function helperTextLayer(editText,charAmt) {
-        var helperLayer = activeComp.layers.addText(editText);
+    function helperTextLayer(currentComp ,editText,charAmt) {
+        var helperLayer = currentComp.layers.addText(editText);
         helperLayer.name = "READ ME";
 
         var helperLayerTextProp = helperLayer.property("ADBE Text Properties");
