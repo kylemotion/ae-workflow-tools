@@ -120,10 +120,6 @@
             globalLayerNames.push(i.toString() + ". " + existingComp.layer(i).name);
             dropDown.add("item", globalLayerNames[globalLayerNames.length-1])
 
-            if(existingComp.layer(i) instanceof AVLayer && existingComp.layer(i).canSetCollapseTransformation){
-                existingComp.layer(i).collapseTransformation = true
-            }
-
         }
     } 
     
