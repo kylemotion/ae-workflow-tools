@@ -36,10 +36,12 @@
         var logoButton = headerGroup.add("image", undefined, gmLogo);
 
 
-        var addRenderQuePanel = win.add("panel", undefined, "Add to Render Que");
-        addRenderQuePanel.alignChildren = ["fill", "top"];
-        var addRQButton = addRenderQuePanel.add("button", undefined, "Add to Render Queue");
-
+        var renderQuePanel = win.add("panel", undefined, "Render Queue");
+        renderQuePanel.orientation = 'row';
+        renderQuePanel.alignChildren = ["fill", "top"];
+        var addRQButton = renderQuePanel.add("button", undefined, "Add to Render Queue");
+        var clearRQButton = renderQuePanel.add("button", undefined, "Clear Render Queue");
+        
         // ----- A panel  for setting the save location of your render ------
         var saveLocationPanel = win.add("panel", undefined, "Output Location");
         saveLocationPanel.orientation = 'row';
@@ -98,15 +100,8 @@
         var renderGroup = win.add("panel", undefined, "Render Me");
         renderGroup.orientation = 'row';
         renderGroup.alignChildren = ["fill", "top"];
-        var renderButton = renderGroup.add("button", undefined, "Render");
-
-
-        var helpGroup = win.add("group", undefined, "Help Me");
-        renderGroup.orientation = 'row';
-        helpGroup.alignment = ["right", "top"];
-        var helpButton = helpGroup.add("button", undefined, "?");
-        helpButton.alignment = ["center", ""];
-        helpButton.size = [25, 25];
+        var renderButton = renderGroup.add("button", undefined, "Render Me");
+        var helpButton = renderGroup.add("button", undefined, "Help Me");
 
         changeLocationButton.onClick = function () {
             app.beginUndoGroup("output location");
@@ -122,25 +117,24 @@
         helpButton.onClick = function () {
             alert("How to use:\nSelect comps\nClick Add to Render Que Button\nSet your destination folder.\nSelect your Output Module.\nEnter your clip name.\nClick Render.")
         }
-
-
-        var activeSelection = app.project.selection;
-    
-
+        
         function getActiveSelection() {
+            var activeComp = app.project.activeItem;
             var compNameArray = new Array();
-
-            for (var i = 0; i < activeSelection.length; i++) {
-                if (activeSelection[i] instanceof CompItem) {
-                    compNameArray.push(activeSelection[i])
+            var activeSelection = app.project.selection;
+            if (activeSelection.length > 1) {
+                for (var i = 0; i < activeSelection.length; i++) {
+                    if (activeSelection[i] instanceof CompItem) {
+                        compNameArray.push(activeSelection[i])
+                    }
                 }
+            } else if (activeComp && activeComp instanceof CompItem) {
+                compNameArray.push(activeComp)
             }
+
             return compNameArray
+
         }
-
-        var compSelection = getActiveSelection();
-
-        var activeComp = app.project.activeItem;
         
         var renderQueue = app.project.renderQueue;
 
@@ -158,6 +152,8 @@
 
 
         function addToRenderQueue(compsSelected) {
+            var activeComp = app.project.activeItem;
+
             while (renderQueue.numItems > 0) {
                 renderQueue.item(1).remove();
             }
@@ -180,9 +176,17 @@
 
         addRQButton.onClick = function () {
             app.beginUndoGroup("Add To Render Que");
+            var activeSelection = app.project.selection;
 
             if (!activeSelection) {
                 alert("Select one or more comps in your project panel first");
+                return
+            }
+
+            var compSelection = getActiveSelection();
+            
+            if (compSelection == 0) {
+                alert("Please open up a comp first or select atleast one comp from the project panel and try again")
                 return
             }
 
@@ -196,6 +200,20 @@
             app.endUndoGroup();
         }
 
+
+        clearRQButton.onClick = function () {
+            app.beginUndoGroup("Clear Render Queue");
+
+            if (renderQueue.numItems == 0) {
+                alert("There are no items to remove from the Render Queue");
+                return
+            }
+
+            while (renderQueue.numItems > 0) {
+                renderQueue.item(1).remove();
+            }
+            app.endUndoGroup();
+        }
         
         function populateOutputModules(renderSettingsList) {
             renderSettingsList.removeAll();
@@ -224,6 +242,12 @@
             renderSettingsDropdown.selection = 0
         }
 
+
+        if (renderQueue.numItems > 0) {
+            renderNameEdit.text = renderQueue.item(1).comp.name
+        }
+
+
         compNameButton.onClick = function () {
             renderNameEdit.text = renderQueue.item(1).comp.name;
         }
@@ -241,8 +265,8 @@
                 win.close()
                 return
             } else {
-                win.close();
                 startRenderProcess(renderSettingsDropdown, compNameButton.value, renderNameEdit.text, saveLocationChange.text, renderInAEButton.value);
+                win.close();
                 while (renderQueue.numItems > 0) {
                     renderQueue.item(1).remove();
                 }
