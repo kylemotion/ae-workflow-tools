@@ -6,7 +6,7 @@
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
  * @version 0.3.0
- * 6.5.2022
+ * 6.6.2022
  * 
  * 
 */
@@ -82,8 +82,6 @@
         howWorkButton.helpTip = "Select the position properties inside of the shape groups that you wish to apply the position to. Click your desired button to apply the expression to.";
 
 
-        var comp = app.project.activeItem;
-
         /**
             *
             *
@@ -100,18 +98,20 @@
             return propArray;
         }
 
-        var propArray = compSelectedProperties(comp);
  
-
-
         topLeftButton.onClick = function () {
             app.beginUndoGroup("Top Left");
+
+
+            var comp = app.project.activeItem;
 
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
 
+            var propArray = compSelectedProperties(comp);
+            
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
                 return
@@ -125,10 +125,14 @@
         topMiddleButton.onClick = function () {
             app.beginUndoGroup("Top Middle");
 
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -144,10 +148,15 @@
         topRightButton.onClick = function () {
             app.beginUndoGroup("Top Right");
 
+
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -162,10 +171,14 @@
         midLeftButton.onClick = function () {
             app.beginUndoGroup("Mid Left");
 
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -180,10 +193,15 @@
 
         middleButton.onClick = function () {
             app.beginUndoGroup("Mid");
+
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -198,10 +216,16 @@
         midRightButton.onClick = function () {
             app.beginUndoGroup("Mid Right");
 
+            var comp = comp;
+
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -216,10 +240,16 @@
         botLeftButton.onClick = function () {
             app.beginUndoGroup("Top Right");
 
+            var comp = comp;
+
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -233,10 +263,15 @@
 
         botMiddleButton.onClick = function () {
             app.beginUndoGroup("Bot Mid");
+
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -251,10 +286,14 @@
         botRightButton.onClick = function () {
             app.beginUndoGroup("Bot Right");
 
+            var comp = app.project.activeItem;
+
             if (!(comp && comp instanceof CompItem)) {
                 alert("Select or open a comp first!")
                 return
             }
+
+            var propArray = compSelectedProperties(comp);
 
             if (comp.selectedLayers < 1) {
                 alert("Select the Position property in your shape group first");
@@ -276,6 +315,22 @@
 
         roundnessButton.onClick = function () {
             app.beginUndoGroup("roundness");
+
+            var comp = app.project.activeItem;
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            var propArray = compSelectedProperties(comp);
+
+            if (comp.selectedLayers < 1) {
+                alert("Select the Position property in your shape group first");
+                return
+            }
+
+
             roundnessExpression(propArray);
             win.close();
             app.endUndoGroup()
