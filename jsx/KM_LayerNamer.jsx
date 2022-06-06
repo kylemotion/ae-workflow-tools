@@ -66,10 +66,10 @@
         //     app.endUndoGroup()
         // }
 
-        var activeComp = app.project.activeItem;
-
+        
         renameButton.onClick = function () {
             app.beginUndoGroup("rename")
+            var activeComp = app.project.activeItem;
 
             if (!(activeComp && activeComp instanceof CompItem)) {
                 alert("Please open up a comp first!")
