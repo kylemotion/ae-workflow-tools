@@ -42,6 +42,7 @@ function copyLayerMarkers(fromLayer,toLayers){
 }
 
 
+
 function copyCompMarkers(fromComp,toComps){
 
     for(var b = 0; b < proj.selection.length; b++){
@@ -81,13 +82,46 @@ function copyCompMarkers(fromComp,toComps){
         
 }
 
+function pushPreCompLayerMarkers(fromComp,toPreComps){
+
+    var newMarker;
+    var fromPreCompLayerMarkers = fromComp.markerProperty;
+
+    for(var i = 1; i<=fromPreCompLayerMarkers.numKeys; i++){
+        var markerKeyVal = fromPreCompLayerMarkers.keyValue(i);
+        newMarker = new MarkerValue(markerKeyVal.comment);
+        newMarker.comment = markerKeyVal.comment;
+        newMarker.cuePointName = markerKeyVal.cuePointName;
+        newMarker.duration = markerKeyVal.duration;
+        newMarker.eventCuePoint = markerKeyVal.eventCuePoint;
+        newMarker.frameTarget = markerKeyVal.frameTarget;
+        newMarker.url = markerKeyVal.url;
+        newMarker.label = markerKeyVal.label;
+        newMarker.protectedRegion = markerKeyVal.protectedRegion;
+        for(var t = 0; t<activeComp.selectedLayers.length; t++){
+            toPreComps[t].source.markerProperty.setValueAtTime(fromPreCompLayerMarkers.keyTime(i), newMarker);
+        }
+        
+    }
+
+    if(!(activeComp.selectedLayers[0].source instanceof CompItem)){
+        alert("Please select a layer that is a precomp")
+        return
+    } else {
+        return
+    }
+
+}
+
 app.beginUndoGroup("Copy Markers");
 
     var keyState = ScriptUI.environment.keyboardState;
 
     if(keyState.shiftKey){
         copyCompMarkers(proj.activeItem,proj.selection)
-    } else {
+    } else if(keyState.metaKey || keyState.ctrlKey) {
+        pushPreCompLayerMarkers(activeComp,activeComp.selectedLayers)
+    }else {
         copyLayerMarkers(activeComp.selectedLayers[0],activeComp.selectedLayers)
     }
 
