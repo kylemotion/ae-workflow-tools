@@ -99,7 +99,7 @@ function pushPreCompLayerMarkers(fromComp,toPreComps){
         newMarker.label = markerKeyVal.label;
         newMarker.protectedRegion = markerKeyVal.protectedRegion;
         for(var t = 0; t<activeComp.selectedLayers.length; t++){
-            toPreComps[t].source.markerProperty.setValueAtTime(fromPreCompLayerMarkers.keyTime(i), newMarker);
+            toPreComps[t].source.markerProperty.setValueAtTime(toPreComps[t].inPoint + fromPreCompLayerMarkers.keyTime(i), newMarker);
         }
         
     }
