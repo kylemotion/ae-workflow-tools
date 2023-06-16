@@ -43,28 +43,13 @@
         var separatorEdit = separatorGroup.add("edittext", undefined, "-")
         separatorEdit.characters = 5;
 
-        // var replaceNamePanel = win.add("panel", undefined, "Replace Text");
-        // replaceNamePanel.orientation = 'column';
-        // replaceNamePanel.alignChildren = ["fill", "fill"];
-        // var replaceEdit = replaceNamePanel.add("edittext", undefined, "Text to be replaced");
-        // replaceEdit.characters = 20;
-        // var newText = replaceNamePanel.add("edittext", undefined, "New Text to replace");
-        // newText.characters = 20;
 
         var buttonGroup = win.add("group", undefined, "buttons");
         buttonGroup.orientation = 'row';
         buttonGroup.alignChildren = ["fill", "top"];
-        // var replaceButton = buttonGroup.add("button", undefined, "Replace");
-        // replaceButton.size = [100, 25]
+
         var renameButton = buttonGroup.add("button", undefined, "Rename");
         renameButton.size = [100, 25]
-
-        // replaceButton.onClick = function () {
-        //     app.beginUndoGroup("replace");
-        //     replaceText(replaceEdit.text, newText.text);
-        //     win.close();
-        //     app.endUndoGroup()
-        // }
 
         
         renameButton.onClick = function () {
@@ -111,15 +96,6 @@
 
         return selectedLayers
     }
-
-    // function replaceText(oldText, updatedText) {
-    //     for (var i = 0; i < selectedLayers.length; i++) {
-    //         selectedLayers[i].name.replace(/oldText/g, updatedText)
-    //     }
-    //     return
-    // }
-
-
 
 })(this)
 
