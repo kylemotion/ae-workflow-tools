@@ -4,9 +4,9 @@
  * dockable: yes
  * 
  * 
- * @author: Kyle Harter <k.harter@glassandmarker.com>
+ * @author: Kyle Harter <kylenmotion@gmail.com>
  * @version 0.3.0
- * 6.6.2022
+ * 6.26.2023
  * 
  * 
 */
