@@ -28,7 +28,7 @@
         win.alignChildren = ["fill", "top"];
 
         var layerNameSepPanel = win.add("panel", undefined);
-        layerNameSepPanel.orientation = "row";
+        layerNameSepPanel.orientation = "column";
         layerNameSepPanel.alignChildren = ["fill", "top"];
         var layerNameEditGroup = layerNameSepPanel.add("group", undefined, "Layer Name Group");
         layerNameEditGroup.orientation = "column";
@@ -39,9 +39,24 @@
         var separatorGroup = layerNameSepPanel.add("group", undefined, "Separator Group");
         separatorGroup.orientation = "column";
         separatorGroup.alignChildren = "left";
-        var separatorStatic = separatorGroup.add("statictext", undefined, "Seperator")
+        var separatorStatic = separatorGroup.add("statictext", undefined, "Separator")
         var separatorEdit = separatorGroup.add("edittext", undefined, "-")
-        separatorEdit.characters = 5;
+        separatorEdit.characters = 20;
+
+        // var utilitiesPanel = win.add("panel", undefined, "Utilities");
+        // utilitiesPanel.orientation = "row";
+        // utilitiesPanel.alignChildren = ["fill", "top"];
+        var utilitiesGroup = layerNameSepPanel.add("group", undefined);
+        utilitiesGroup.orientation = "column";
+        utilitiesGroup.alignChildren = "left";
+        var startNumberStatic = utilitiesGroup.add("statictext", undefined, "Start Number");
+        var startNumberEdit = utilitiesGroup.add("edittext", undefined);
+        startNumberEdit.characters = 20;
+        var separatorOverrideGroup = layerNameSepPanel.add("group", undefined);
+        separatorOverrideGroup.orientation = "row";
+        separatorOverrideGroup.alignChildren = "left";
+        var separatoeStaticText = separatorOverrideGroup.add("statictext", undefined, "Separator Override")
+        var iterateOverrideCheckbox = separatorOverrideGroup.add("checkbox", undefined)
 
 
         var buttonGroup = win.add("group", undefined, "buttons");
@@ -67,7 +82,7 @@
                 return
             }
 
-            renameLayers(selectedLayers,layerNameEdit.text, separatorEdit.text);
+            renameLayers(selectedLayers,layerNameEdit.text, separatorEdit.text,startNumberEdit.text,iterateOverrideCheckbox.value);
             win.close();
             app.endUndoGroup()
         }
@@ -88,10 +103,20 @@
 
 
 
-    function renameLayers(selectedLayers,layerNames, separator) {
+    function renameLayers(selectedLayers,layerNames, separator, startNum, override) {
+
         for (var i = 0; i < selectedLayers.length; i++) {
             var count = i + 1;
-            selectedLayers[i].name = layerNames + separator + count
+            var startNumCount = Number(startNum) + i;
+            if(override == false){
+                if(!startNum){
+                    selectedLayers[i].name = layerNames + separator + count
+                } else {
+                    selectedLayers[i].name = layerNames + separator + startNumCount
+                }
+            } else {
+                selectedLayers[i].name = layerNames
+            }
         }
 
         return selectedLayers
