@@ -34,7 +34,7 @@
         layerNameEditGroup.orientation = "column";
         layerNameEditGroup.alignChildren = "left";
         var layerNameStatic = layerNameEditGroup.add("statictext", undefined, "Layer Name");
-        var layerNameEdit = layerNameEditGroup.add("edittext", undefined, "New Layer Name");
+        var layerNameEdit = layerNameEditGroup.add("edittext", undefined, "Enter custom layer name");
         layerNameEdit.characters = 20;
         var separatorGroup = layerNameSepPanel.add("group", undefined, "Separator Group");
         separatorGroup.orientation = "column";
@@ -52,11 +52,11 @@
         var startNumberStatic = utilitiesGroup.add("statictext", undefined, "Start Number");
         var startNumberEdit = utilitiesGroup.add("edittext", undefined, "Enter start number");
         startNumberEdit.characters = 20;
-        var separatorOverrideGroup = layerNameSepPanel.add("group", undefined);
-        separatorOverrideGroup.orientation = "row";
-        separatorOverrideGroup.alignChildren = "left";
-        var separatoeStaticText = separatorOverrideGroup.add("statictext", undefined, "Separator Override")
-        var iterateOverrideCheckbox = separatorOverrideGroup.add("checkbox", undefined)
+        var overrideGroup = layerNameSepPanel.add("group", undefined);
+        overrideGroup.orientation = "row";
+        overrideGroup.alignChildren = "left";
+        var overrideStaticText = overrideGroup.add("statictext", undefined, "Iteration override")
+        var iterateOverrideCheckbox = overrideGroup.add("checkbox", undefined)
 
 
         var buttonGroup = win.add("group", undefined, "buttons");
