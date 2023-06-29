@@ -29,8 +29,18 @@
         
         var mainWindow = win.add("group", undefined, "main window")
         mainWindow.orientation = "column";
+        
+        var sizeSlidersGroup = mainWindow.add("panel", undefined, "Size");
+        sizeSlidersGroup.orientation = "column";
+        sizeSlidersGroup.spacing = 10;
+        var sizeSliderButton = sizeSlidersGroup.add("button", undefined, "Add Size Sliders");
+        sizeSliderButton.helpTip = "Click to add slider controls to size property";
+        sizeSliderButton.preferredSize = [100, 25]
+        var sizeExpressionButton = sizeSlidersGroup.add("button", undefined, "Link Sliders");
+        sizeExpressionButton.helpTip = "Click to link size property to sliders";
+        sizeExpressionButton.preferredSize = [100, 25]
 
-        var buttonsGroup = mainWindow.add("panel", undefined, "Shape Anchor Position");
+        var buttonsGroup = mainWindow.add("panel", undefined, "Position");
         buttonsGroup.orientation = "column";
         buttonsGroup.spacing = 10;
         var topRowButtonsGroup = buttonsGroup.add("group", undefined, "Top Row Group");
@@ -66,7 +76,7 @@
         botRightButton.preferredSize = [25, 25];
         botRightButton.helpTip = "Bottom Right"
             
-        var bottomRoundnessGroup = mainWindow.add("panel", undefined, "Roundness Expression");
+        var bottomRoundnessGroup = mainWindow.add("panel", undefined, "Roundness");
         var roundnessButton = bottomRoundnessGroup.add("Button", undefined, "");
         roundnessButton.text = 'Roundness';
         roundnessButton.preferredSize = [100, 25];
@@ -99,6 +109,31 @@
         }
 
  
+
+
+        sizeSliderButton.onClick = function () {
+            app.beginUndoGroup("size slider");
+
+
+            var comp = app.project.activeItem;
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+            var propArray = compSelectedProperties(comp);
+            
+            if (comp.selectedLayers < 1) {
+                alert("Select the size property in your shape group first");
+                return
+            }
+
+            addSizeSliders(propArray);
+            win.close();
+            app.endUndoGroup()
+        }
+
         topLeftButton.onClick = function () {
             app.beginUndoGroup("Top Left");
 
@@ -353,7 +388,27 @@
     }
             
 
-    
+    function addSizeSliders(selectedProps){
+        var comp = app.project.activeItem;
+
+            if (!(comp && comp instanceof CompItem)) {
+                alert("Select or open a comp first!")
+                return
+            }
+
+        var selectedLayer = comp.selectedLayer;
+        alert(selectedLayer.name)
+        var props = selectedProps;
+        
+        
+
+  /*       for(var i = 0; i<props.length; i++){
+        props[i].expression = 
+        'var xSizeSlider = thisLayer.effect()(1);\
+        var ySizeSlider = thisLayer.effect()(1);\
+        [xSizeSlider,ySizeSlider]' 
+            }*/
+    }
     
         /**
          *
