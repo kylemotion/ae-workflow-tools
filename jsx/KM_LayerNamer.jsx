@@ -3,8 +3,8 @@
  * renames layers in batches
  * 
  * @author: Kyle Harter <k.harter@glassandmarker.com>
- * @version 0.2.1
- * 6.1.2022
+ * @version 0.3.1
+ * 6.297.2023
  */
 
 
@@ -50,7 +50,7 @@
         utilitiesGroup.orientation = "column";
         utilitiesGroup.alignChildren = "left";
         var startNumberStatic = utilitiesGroup.add("statictext", undefined, "Start Number");
-        var startNumberEdit = utilitiesGroup.add("edittext", undefined);
+        var startNumberEdit = utilitiesGroup.add("edittext", undefined, "Enter start number");
         startNumberEdit.characters = 20;
         var separatorOverrideGroup = layerNameSepPanel.add("group", undefined);
         separatorOverrideGroup.orientation = "row";
@@ -109,7 +109,7 @@
             var count = i + 1;
             var startNumCount = Number(startNum) + i;
             if(override == false){
-                if(!startNum){
+                if(!startNum || isNaN(startNum)){
                     selectedLayers[i].name = layerNames + separator + count
                 } else {
                     selectedLayers[i].name = layerNames + separator + startNumCount
