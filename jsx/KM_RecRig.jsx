@@ -1,6 +1,5 @@
 /**
- * Adds slider controls for rectangle size 
- * Links size property to sliders via expressions
+ * Adds slider controls or rectangle size and links size property to sliders via expressions
  * Set Anchor Point of Position Property in Shape Group 
  * apply roundness expression for rounded corners
  * dockable: yes
@@ -13,7 +12,7 @@
  * 
 */
 
-(function km_shapeAnchor(thisObj){
+(function km_recRig(thisObj){
 
     createUI(thisObj);
 
@@ -35,12 +34,9 @@
         var sizeSlidersGroup = mainWindow.add("panel", undefined, "Size");
         sizeSlidersGroup.orientation = "column";
         sizeSlidersGroup.spacing = 10;
-        var sizeSliderButton = sizeSlidersGroup.add("button", undefined, "Add Size Sliders");
+        var sizeSliderButton = sizeSlidersGroup.add("button", undefined, "Add/Link Size");
         sizeSliderButton.helpTip = "Click to add slider controls to size property";
         sizeSliderButton.preferredSize = [100, 25]
-        var linkSizeButton = sizeSlidersGroup.add("button", undefined, "Link Size Sliders");
-        linkSizeButton.helpTip = "Click to link size property to sliders";
-        linkSizeButton.preferredSize = [100, 25]
 
         var buttonsGroup = mainWindow.add("panel", undefined, "Position");
         buttonsGroup.orientation = "column";
@@ -125,38 +121,14 @@
             
 
             var selLayers = comp.selectedLayers;
-
-            if (selLayers < 1) {
-                alert("Select atleast 1 layer to apply size sliders");
-                return
-            }
-
-            addSizeSliders(selLayers);
-
-            win.close();
-            app.endUndoGroup()
-        }
-
-        linkSizeButton.onClick = function () {
-            app.beginUndoGroup("add size slider");
-
-            var comp = app.project.activeItem;
-
-            if (!(comp && comp instanceof CompItem)) {
-                alert("Select or open a comp first!")
-                return
-            }
-            
             var propArray = compSelectedProperties(comp);
 
-            var selLayers = comp.selectedLayers;
-
             if (selLayers < 1) {
                 alert("Select atleast 1 layer to apply size sliders");
                 return
             }
 
-            sizeExpression(propArray);
+            addSizeLinkSliders(selLayers, propArray);
 
             win.close();
             app.endUndoGroup()
@@ -423,39 +395,47 @@
      */
 
 
-    function addSizeSliders(sliderLayers){
+    function addSizeLinkSliders(sliderLayers, properties){
+
+        var xSliderName = "X - Size Slider";
+        var YSliderName = "Y - Size Slider";
 
         for(var i = 0; i<sliderLayers.length; i++){
+
             var xSlider = sliderLayers[i].property("ADBE Effect Parade").addProperty("ADBE Slider Control");
-            xSlider.name = "X - Size Slider";
+            xSlider.name = xSliderName;
             xSlider.property(1).setValue(800);
+            
 
             var ySlider = sliderLayers[i].property("ADBE Effect Parade").addProperty("ADBE Slider Control");
-            ySlider.name = "Y - Size Slider";
+            ySlider.name = YSliderName;
             ySlider.property(1).setValue(250);
         }
+            
         
-        return
+        var props = properties;
+
+
+            for (var b = 0; b < props.length; b++) {
+                
+                var xSizeExpression = 'effect("'+xSliderName+'")(1).value';
+                var ySizeExpression = 'effect("'+YSliderName+'")(1).value';
+            
+    
+                props[b].expression =
+                'x = '+xSizeExpression+';\
+                y = '+ySizeExpression+';\
+                [x,y]'
+    
+                }
+
+           
+
+        
+        return 
 
     }
 
-    /**
-     * 
-     * @param {*} selectedProps 
-     * @returns selectedProps - Applies expression to link size to sliders
-     */
-    function sizeExpression(selectedProps){
-
-        var props = selectedProps;    
-            for(var i = 0; i<props.length; i++){
-                props[i].expression = 
-                'x = effect("X - Size Slider")(1);\
-                y = effect("Y - Size Slider")(1);\
-                [x,y]'
-            }
-
-           return selectedProps
-        }
 
 
         /**
