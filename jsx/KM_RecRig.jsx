@@ -21,7 +21,7 @@
     function createUI(thisObj) {
         var win = thisObj instanceof Panel
             ? thisObj
-            : new Window("window", "km_shapeAnchor", undefined, {
+            : new Window("window", "km_RecRig", undefined, {
                 resizeable: true
             })
 
@@ -84,14 +84,14 @@
         roundnessButton.preferredSize = [100, 25];
         roundnessButton.helpTip = "Apply to Roundness property on parametric shape"
             
-        var bottomHelpGroup = mainWindow.add("panel", undefined, "Help");
+        /* var bottomHelpGroup = mainWindow.add("panel", undefined, "Help");
         bottomHelpGroup.orientation = "column";
         var questionButton = bottomHelpGroup.add("Button", undefined, "What do I do?");
         questionButton.preferredSize = [100, 25];
         questionButton.helpTip = "This script applies expressions to the position property of a parametric shape group. It's ideal for rectangles and ellipses."
         var howWorkButton = bottomHelpGroup.add("Button", undefined, "How do I work?");
         howWorkButton.preferredSize = [100, 25];
-        howWorkButton.helpTip = "Select the position properties inside of the shape groups that you wish to apply the position to. Click your desired button to apply the expression to.";
+        howWorkButton.helpTip = "Select the position properties inside of the shape groups that you wish to apply the position to. Click your desired button to apply the expression to."; */
 
 
         /**
@@ -368,13 +368,13 @@
             app.endUndoGroup()
         }
 
-        questionButton.onClick = function () {
+/*         questionButton.onClick = function () {
             alert(questionButton.helpTip)
         }
 
         howWorkButton.onClick = function () {
             alert(howWorkButton.helpTip)
-        }
+        } */
 
         roundnessButton.onClick = function () {
             app.beginUndoGroup("roundness");
