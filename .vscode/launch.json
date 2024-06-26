@@ -6,17 +6,13 @@
     "configurations": [
         {
             "type": "extendscript-debug",
-            "request": "launch",
-            "name": "Current file",
-            "program": "${file}",
-            "stopOnEntry": false
+            "request": "attach",
+            "name": "Attach to ExtendScript Engine"
         },
         {
             "type": "extendscript-debug",
             "request": "launch",
-            "name": "Ask for script name",
-            "program": "${workspaceFolder}/${command:AskForScriptName}",
-            "stopOnEntry": false
+            "name": "Launch Script in ExtendScript Engine"
         }
     ]
 }
