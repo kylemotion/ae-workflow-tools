@@ -13,6 +13,9 @@
  * 
  * 
 */
+
+
+
 (function km_compLayerDuration(){
 
 
